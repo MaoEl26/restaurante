@@ -31,6 +31,7 @@ class Controladora : public QGraphicsView
 
 protected:
     QString filename;
+    int nodoSeleccionado;
 
 public:
     Controladora();
@@ -39,6 +40,7 @@ public:
     void agregarBotonesJugar();
     void getDireccionArchivo();
     void menuSeleccionFunciones();
+
 //    void separaDoc();
 
     QGraphicsScene *scene;
@@ -61,6 +63,8 @@ public slots:
         /// aqui va la respuesta de los boton
         void startMenu();
         void exit();
+        void checkSeleccion();
+        void guardaNodoDijkstra();
 };
 
 #endif // CONTROLADORA_H
