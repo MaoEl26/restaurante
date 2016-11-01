@@ -10,13 +10,11 @@ using namespace std;
 class Kruskal
 {
     public:
-        Kruskal();
+        Kruskal(Matriz<ArrayList<int> *, int>* matriz, int cantidadNodos);
         virtual ~Kruskal();
 
     protected:
-        void print();
-        void ingresoDatos();
-        void algoritmoKruskal();
+        Matriz<ArrayList<int>*,int>* algoritmoKruskal();
 
         int nodos;
         Matriz<ArrayList<int>*,int> *matrizKruskalInicial;
