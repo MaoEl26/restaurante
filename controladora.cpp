@@ -168,7 +168,7 @@ void Controladora::guardaNodoDijkstra(){
     nodoSeleccionado = menuDijkstra->currentIndex();
     if(nodoSeleccionado != nulo){
         nodoSeleccionado--;
-        QMessageBox::information(this,"Informacion",menuDijkstra->currentText());
+        //QMessageBox::information(this,"Informacion",menuDijkstra->currentText());
         cout<<nodoSeleccionado<<endl;
     }
 }
@@ -176,18 +176,18 @@ void Controladora::guardaNodoDijkstra(){
 void Controladora::checkSeleccion(){
     if(dijkstraRadio->isChecked()){
         menuDijkstra->setEnabled(true);
-        QMessageBox::information(this,"Informacion","Dijkstra");
+        //QMessageBox::information(this,"Informacion","Dijkstra");
     }else{
         menuDijkstra->setEnabled(false);
     }
     if(floydRadio->isChecked()){
-        QMessageBox::information(this,"Informacion","Floyd");
+        //QMessageBox::information(this,"Informacion","Floyd");
     }
     if(primYkruskalRadio->isChecked()){
-        QMessageBox::information(this,"Informacion","Prim y Kruskal");
+        //QMessageBox::information(this,"Informacion","Prim y Kruskal");
     }
     if(warshallRadio->isChecked()){
-        QMessageBox::information(this,"Informacion","Cerradura Transitiva");
+        //QMessageBox::information(this,"Informacion","Cerradura Transitiva");
     }
 }
 
