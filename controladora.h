@@ -1,6 +1,6 @@
 #ifndef CONTROLADORA_H
 #define CONTROLADORA_H
-#include "boton.h"
+
 #include <QGraphicsRectItem>
 #include <QGraphicsTextItem>
 #include <QGraphicsView>
@@ -20,7 +20,10 @@
 #include <QMessageBox>
 #include <QComboBox>
 #include <QRadioButton>
-//#include <QtSql/QSqlDatabase>
+
+#include "boton.h"
+#include "matriz.h"
+#include "arraylist.h"
 
 #include <iostream>
 using namespace std;
@@ -32,6 +35,9 @@ class Controladora : public QGraphicsView
 protected:
     QString filename;
     int nodoSeleccionado;
+    int cantidadNodos;
+
+    Matriz<ArrayList<int>*,int> *matrizAdyacencia;
 
 public:
     Controladora();
@@ -40,8 +46,6 @@ public:
     void agregarBotonesJugar();
     void getDireccionArchivo();
     void menuSeleccionFunciones();
-
-//    void separaDoc();
 
     QGraphicsScene *scene;
 

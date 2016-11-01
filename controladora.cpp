@@ -18,6 +18,7 @@ void Controladora::ambiente(){
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setFixedSize(1305,655);
 }
+
 void Controladora::agregarBotonesJugar(){
 
     //Limpia la escena y establece un nuevo fondo
@@ -40,19 +41,50 @@ void Controladora::agregarBotonesJugar(){
 
 void Controladora::getDireccionArchivo(){
 
+    cantidadNodos = nulo;
+
     filename=QFileDialog::getOpenFileName(this,"Open File","C://","Text File(*.txt)");
 
     QFile documento(filename);
     if(!documento.open(QIODevice::ReadOnly)){
         QMessageBox::information(this,"Informacion",documento.errorString());
     }else{
-   cout<<"URL "<<filename.toStdString()<<endl;
-   QTextStream openDoc(&documento);
-   cout<<"Doc "<<openDoc.readAll().toStdString()<<endl;
-   documento.close();
+       while(!documento.atEnd()){
+           documento.readLine();
+           cantidadNodos++;
+       }
+       documento.close();
 
-   menuSeleccionFunciones();
-   }
+       matrizAdyacencia = new Matriz<ArrayList<int>*,int>(cantidadNodos);
+
+       QFile documento(filename);
+       documento.open(QIODevice::ReadOnly);
+
+       while(!documento.atEnd()){
+           for(int i=0; i<cantidadNodos;i++){
+               QString linea = documento.readLine();
+               QStringList lineaSeparada = linea.split(",");
+
+               for(int j=0;j<cantidadNodos;j++){
+                   QString valorConCambioLinea =lineaSeparada[j];
+                   QString valorFinal = valorConCambioLinea.split("\r\n",QString::SkipEmptyParts)[0];
+
+                   matrizAdyacencia->insert(i,j,valorFinal.toInt());
+               }
+           }
+       }
+
+       documento.close();
+
+       for(int i=0;i<cantidadNodos;i++){
+           for(int j=0;j<cantidadNodos;j++){
+               cout<<matrizAdyacencia->returnPos(i)->returnPos(j);
+           }
+           cout<<endl;
+       }
+
+       menuSeleccionFunciones();
+       }
 }
 
 void Controladora::menuSeleccionFunciones(){
@@ -76,7 +108,7 @@ void Controladora::menuSeleccionFunciones(){
     //Algoritmo de Dijkstra
     dijkstraRadio = new QRadioButton("Dijkstra",this);
     dijkstraRadio->setGeometry(490,220,600,100);//Ingresa las coordenadas y las dimensiones del radio
-    dijkstraRadio->setText("Dijtaaaascf");//Cambia el texto que se muestra en pantalla
+    //dijkstraRadio->setText("Dijtaaaascf");//Cambia el texto que se muestra en pantalla
     //Establece los estilos y lo muestra en pantalla
     dijkstraRadio->setFont(*letrasRadio);
     dijkstraRadio->setPalette(*estiloRadio);
@@ -86,7 +118,7 @@ void Controladora::menuSeleccionFunciones(){
     //Algoritmo de Floyd
     floydRadio = new QRadioButton("Floyd",this);
     floydRadio->setGeometry(490,270,600,100);//Ingresa las coordenadas y las dimensiones del radio
-    floydRadio->setText("FloydElGrande");//Cambia el texto que se muestra en pantalla
+    //floydRadio->setText("FloydElGrande");//Cambia el texto que se muestra en pantalla
     //Establece los estilos y lo muestra en pantalla
     floydRadio->setFont(*letrasRadio);
     floydRadio->setPalette(*estiloRadio);
@@ -94,9 +126,9 @@ void Controladora::menuSeleccionFunciones(){
     connect(floydRadio,SIGNAL(clicked(bool)),this,SLOT(checkSeleccion()));
 
     //Algoritmo de Prim y Kruskal
-    primYkruskalRadio = new QRadioButton("primKruskal",this);
+    primYkruskalRadio = new QRadioButton("Prim-Kruskal",this);
     primYkruskalRadio->setGeometry(490,320,600,100);//Ingresa las coordenadas y las dimensiones del radio
-    primYkruskalRadio->setText("PrimYKruskalLapeste");//Cambia el texto que se muestra en pantalla
+    //primYkruskalRadio->setText("PrimYKruskalLapeste");//Cambia el texto que se muestra en pantalla
     //Establece los estilos y lo muestra en pantalla
     primYkruskalRadio->setFont(*letrasRadio);
     primYkruskalRadio->setPalette(*estiloRadio);
@@ -104,9 +136,9 @@ void Controladora::menuSeleccionFunciones(){
     connect(primYkruskalRadio,SIGNAL(clicked(bool)),this,SLOT(checkSeleccion()));
 
     //Algoritmo de Warshall
-    warshallRadio = new QRadioButton("warshall",this);
+    warshallRadio = new QRadioButton("Warshall",this);
     warshallRadio->setGeometry(490,370,600,100);//Ingresa las coordenadas y las dimensiones del radio
-    warshallRadio->setText("WarshallElcomplicado");//Cambia el texto que se muestra en pantalla
+    //warshallRadio->setText("WarshallElcomplicado");//Cambia el texto que se muestra en pantalla
     //Establece los estilos y lo muestra en pantalla
     warshallRadio->setFont(*letrasRadio);
     warshallRadio->setPalette(*estiloRadio);
@@ -118,11 +150,16 @@ void Controladora::menuSeleccionFunciones(){
     menuDijkstra->setGeometry(700,260,75,25);
     menuDijkstra->setEnabled(false);
     menuDijkstra->addItem("");//0
-    menuDijkstra->addItem("Cocina");//0
-    menuDijkstra->addItem("Mesa 1");//1
-    menuDijkstra->addItem("Mesa 2");//2
-    menuDijkstra->addItem("Mesa 3");//3
+
+    for(int i =0;i<cantidadNodos;i++){
+        if(i==nulo){
+            menuDijkstra->addItem("Cocina");
+        }else{
+            menuDijkstra->addItem("Mesa "+QString::number(i));
+        }
+    }
     menuDijkstra->show();
+
     connect(menuDijkstra,SIGNAL(activated(QString)),this,SLOT(guardaNodoDijkstra()));
 
 }
@@ -156,8 +193,8 @@ void Controladora::checkSeleccion(){
 
 void Controladora::startMenu(){
     getDireccionArchivo();
-    //menuSeleccionFunciones();
 }
+
 void Controladora::exit(){
     QCoreApplication::quit();
 }
