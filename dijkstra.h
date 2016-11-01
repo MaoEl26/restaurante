@@ -9,15 +9,13 @@ using namespace std;
 class Dijkstra
 {
     public:
-        Dijkstra();
+        Dijkstra(int nodos, int nodoBusqueda ,Matriz< ArrayList<int>*,int> *matrizPesos);
         virtual ~Dijkstra();
-
         void algoritmo();
-
         void cantidadNodos();
-        void ruta(int nodoBusqueda);
-
-
+        void ruta();
+        ArrayList<int>getRutaPesos();
+        ArrayList<int>getRutaNodo();
 
     protected:
         Matriz< ArrayList<int>*,int> *matrizPesos;
@@ -25,9 +23,13 @@ class Dijkstra
         ArrayList<bool> *nodosVisitados;
         ArrayList<int>* pesosMenores;
         ArrayList<int>* posicionMenores;
+        ArrayList<int>* rutaNodo;
+        ArrayList<int>* rutaPesos;
         int nodos;
         int ultimaFilaCompletada;
         int busquedaNodoMenor(int fila);
+        int nodoMayorDistancia;
+        int nodoBusqueda;
 
     private:
 };

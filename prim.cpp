@@ -2,82 +2,57 @@
 #define infinito -1
 #define vacio -300
 
-Prim::Prim()
+Prim::Prim(int nodos, Matriz<ArrayList<int> *, int> *matrizPesos)
 {
+   //Inicializa los arreglos y matrices
+    this->matrizPesos= matrizPesos;  //Matriz de pesos de grafo original
+    this->nodos= nodos;   //Cantidad de nodos totales
+    matrizValoresUsados = new Matriz< ArrayList<bool>*,bool>(nodos); //Marcara en true las aristas por las cuales ya
+                                                                        // se recorrio
+    nodosVisitados = new ArrayList<bool>(nodos); //Indicara cuales nodos ya fueron visitados
+    nodosInicial = new ArrayList<int>(nodos);
+    nodosDestinos = new ArrayList<int>(nodos);
+    cantidadNodosVisitados=1; //ira aumentando de acuerdo a los nodos q ya se visitaron
     cantidadNodos();
 }
 
 void Prim::cantidadNodos(){
-    cout<<"Cantidad de nodos "<<endl;
-    cin>>nodos;
-
-    //Inicializa los arreglos y matrices
-    matrizPesos = new Matriz< ArrayList<int>*,int>(nodos);
-    matrizValoresUsados = new Matriz< ArrayList<bool>*,bool>(nodos);
-    nodosVisitados = new ArrayList<bool>(nodos);
-    nodosInicial = new ArrayList<int>(nodos);
-    nodosDestinos = new ArrayList<int>(nodos);
-    cantidadNodosVisitados=1;
 
     //Pone todos los elementos de la matriz en 0 y false
     for(int i=0; i<nodos;i++){
-        matrizPesos->returnPos(i)->allEqual(0);
         matrizValoresUsados->returnPos(i)->allEqual(false);
     }
     pesoMayor=0;
     nodosVisitados->allEqual(false);
     nodosVisitados->setValue(0,true);
+    nodosInicial->allEqual(infinito);
+    nodosDestinos->allEqual(infinito);
 
-    //Pide pesos del grafo al usuario
-    for(int i=0;i<nodos;i++){
+    for(int i=0; i<nodos; i++){
+        //Pone en true la diagonal
+        matrizValoresUsados->returnPos(i)->setValue(i,true);
         for(int j=0; j<nodos;j++){
-            if (j!=i){
-                if((matrizPesos->returnPos(i)->returnPos(j))== 0){
-                string conexion;
-                cout<<"Los nodos v"<<i<<" y v"<<j<<" estan conectados?\nSi lo estan ingrese el peso,"<<
-                "de lo contrario ingrese N "<<endl;
-                cin>>conexion;
-                string numero = conexion;
-                conexion=toupper(conexion[0]);
-                if(conexion!="N"){
-                    int peso;
-                    peso = atoi(numero.c_str());
-                    matrizPesos->returnPos(i)->setValue(j,peso);
-                    matrizPesos->returnPos(j)->setValue(i,peso);
-                    if(peso> pesoMayor){
-                        pesoMayor=peso;
-                    }
-
-                }else{
-                    matrizPesos->returnPos(i)->setValue(j,infinito);
-                    matrizPesos->returnPos(j)->setValue(i,infinito);
-                }
+            //Busca el nodo con mayor peso
+            if(matrizPesos->returnPos(i)->returnPos(j) > pesoMayor){
+                pesoMayor=matrizPesos->returnPos(i)->returnPos(j);
             }
-           }else{
-               matrizPesos->returnPos(i)->setValue(j,0);
-               matrizValoresUsados->returnPos(i)->setValue(j,true);
-          }
         }
     }
 
-    for(int i=0 ;i<nodos; i++){
-            for(int j=0; j<nodos;j++){
-                cout<<matrizPesos->returnPos(i)->returnPos(j)<<" ";
-            }
-       cout<<endl;
-    }
     algoritmo();
 }
 
 void Prim::algoritmo(){
 
+    int contador= 0;
     while(cantidadNodosVisitados!= nodos){
         busquedaNodoMenor();
         matrizValoresUsados->returnPos(filaMenor)->setValue(columnaMenor,true);
         matrizValoresUsados->returnPos(columnaMenor)->setValue(filaMenor,true);
         nodosVisitados->setValue(columnaMenor,true);
-        cout<<"V"<<filaMenor<<"---> V"<<columnaMenor<< " Valor: "<<
-        matrizPesos->returnPos(filaMenor)->returnPos(columnaMenor)<<endl;
+        nodosInicial->setValue(contador,filaMenor);
+        nodosDestinos->setValue(contador,columnaMenor);
+        contador++;
     }
 }
 
@@ -92,15 +67,24 @@ void Prim::busquedaNodoMenor(){
                    matrizValoresUsados->returnPos(i)->returnPos(j)!= true &&
                    pesoMenor >= matrizPesos->returnPos(i)->returnPos(j)&&
                    matrizPesos->returnPos(i)->returnPos(j)!= infinito){
-                    pesoMenor = matrizPesos->returnPos(i)->returnPos(j);
-                    filaMenor= i;
-                    columnaMenor=j;
+                   pesoMenor = matrizPesos->returnPos(i)->returnPos(j);
+                   filaMenor= i;
+                   columnaMenor=j;
                }
             }
         }
     }
     cantidadNodosVisitados+=1;
 }
+
+ArrayList<int> Prim::getRutaInicial(){
+    return *nodosInicial;
+}
+
+ArrayList<int> Prim::getRutaDestino(){
+    return *nodosDestinos;
+}
+
 Prim::~Prim()
 {
     //dtor

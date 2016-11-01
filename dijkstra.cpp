@@ -3,56 +3,32 @@
 #define infinito -1
 #define vacio -300
 
-Dijkstra::Dijkstra()
+Dijkstra::Dijkstra(int nodos, int nodoBusqueda, Matriz<ArrayList<int> *, int> *matrizPesos)
 {
+    this->matrizPesos= matrizPesos; //Matriz de pesos original
+    this->nodos= nodos; //Cantidad de nodos
+    this->nodoBusqueda = nodoBusqueda; //Nodo inicial con el cual se va realizar la matriz de dijsktra
+    matrizPesosDijkstra = new Matriz< ArrayList<int>*,int>(nodos); //Guardara los valores de la matriz de dijkstra
+    pesosMenores= new ArrayList<int>(nodos); //Guardara los pesos de los nodos menores q se representan con un cuadro en la matriz
+    posicionMenores= new ArrayList<int>(nodos);//Guardara los nodos menores q se representan con un cuadro en la matriz
+    nodosVisitados = new ArrayList<bool>(nodos);  //Identificara si la columna ya tiene su nodo menor
+    rutaNodo = new ArrayList<int>(nodos);
+    rutaPesos = new ArrayList<int>(nodos);
     cantidadNodos();
 }
 
 void Dijkstra::cantidadNodos(){
-    cout<<"Cantidad de nodos "<<endl;
-    cin>>nodos;
-    //Inicializa los arreglos y matrices
-    matrizPesos = new Matriz< ArrayList<int>*,int>(nodos);
-    matrizPesosDijkstra = new Matriz< ArrayList<int>*,int>(nodos);
-    pesosMenores= new ArrayList<int>(nodos);
-    posicionMenores= new ArrayList<int>(nodos);
-    nodosVisitados = new ArrayList<bool>(nodos);
 
-    //
     for (int i=0; i< nodos; i++){
         pesosMenores->append(vacio);
         nodosVisitados->append(false);
     }
-    for(int i=0;i<nodos;i++){
-        for(int j=0; j<nodos;j++){
-            if (j!=i){
-                string conexion;
-                cout<<"Los nodos v"<<i<<" y v"<<j<<" estan conectados?\nSi lo estan ingrese el peso,"<<
-                "de lo contrario ingrese N "<<endl;
-                cin>>conexion;
-                string numero = conexion;
-                conexion=toupper(conexion[0]);
-                if(conexion!="N"){
-                    int peso;
-                    peso = atoi(numero.c_str());
-                    matrizPesos->insert(i,j,peso);
-                }else{
-                    matrizPesos->insert(i,j,infinito);
-                }
-           }else{
-                matrizPesos->insert(i,j,0);
-          }
-        }
-    }
+    algoritmo();
 
-   algoritmo();
-   cout<<endl;
 }
 
 void Dijkstra::algoritmo(){
-    int nodoBusqueda;
-    cout<<"Ingrese el nodo a buscar, apartir de 0 a "<<nodos-1<<endl;
-    cin>>nodoBusqueda;
+
     pesosMenores->remove(nodoBusqueda);
     pesosMenores->goToPos(nodoBusqueda);
     pesosMenores->insert(0);
@@ -115,7 +91,6 @@ void Dijkstra::algoritmo(){
                                     valorFilaAnterior);
                     }
                     else if(valorFilaAnterior== infinito){
-                        //cout<< "Columna menor: "<<columnaMenor<<"valor: "<<valorFilaActual<<endl;
 
                         posicionMenores->goToPos(j);
                         posicionMenores->remove(j);
@@ -149,6 +124,8 @@ void Dijkstra::algoritmo(){
 
     for(int g =0 ; g<nodos;g++){
         if(pesosMenores->returnPos(g)== vacio){
+
+            nodoMayorDistancia=g;
             pesosMenores->remove(g);
             pesosMenores->goToPos(g);
             pesosMenores->insert
@@ -156,7 +133,7 @@ void Dijkstra::algoritmo(){
         }
     }
 
-    ruta(nodoBusqueda);
+    ruta();
 }
 
 int Dijkstra::busquedaNodoMenor(int fila){
@@ -200,36 +177,39 @@ int Dijkstra::busquedaNodoMenor(int fila){
         return columna;
 }
 
-void Dijkstra::ruta(int nodoBusqueda){
-    cout <<endl<< "Rutas"<<endl;
+void Dijkstra::ruta(){
 
-    int nodoPosicion;
-    bool encontrado;
-    int pesoTotal;
+    rutaNodo->allEqual(infinito);
+    rutaPesos->allEqual(infinito);
+    int nodoPosicion= nodoMayorDistancia;
+    bool encontrado= false;
+    int pesoTotal=0;
     int peso;
-    for (int i=0 ; i< nodos; i++ ){
-        cout<< "===Ruta destino: V"<<i<<"==="<<endl;
-        nodoPosicion= i;
-        //cout << "V"<<posicionMenores->returnPos(nodoPosicion)<<endl;
-        pesoTotal=0;
-        encontrado= false;
+    int columna= 0;
 
-        while(encontrado!=true){
-            peso=pesosMenores->returnPos(nodoPosicion);
-            pesoTotal+= peso;
-            nodoPosicion= posicionMenores->returnPos(nodoPosicion);
+    while(encontrado!=true){
+        peso=pesosMenores->returnPos(nodoPosicion);
+        rutaPesos->setValue(columna,peso);
+        pesoTotal+= peso;
+        nodoPosicion= posicionMenores->returnPos(nodoPosicion);
+        rutaNodo->setValue(columna,nodoPosicion);
 
-            cout << "V"<<nodoPosicion<<"  ->peso: "<<peso<<endl ;
-            if(pesosMenores->returnPos(nodoPosicion)== 0){
-                encontrado= true;
-            }
-
+        columna++;
+        if(pesosMenores->returnPos(nodoPosicion)== 0){
+            encontrado= true;
         }
-        cout << "V"<<posicionMenores->returnPos(nodoPosicion)<<"  ->peso: 0"<<endl;
-        cout<< "Peso total: "<< pesoTotal<< endl<<endl;
     }
+    rutaNodo->setValue(columna,posicionMenores->returnPos(nodoPosicion));
+    rutaPesos->setValue(columna,0);
 }
 
+ArrayList<int> Dijkstra::getRutaNodo(){
+    return *rutaNodo;
+}
+
+ArrayList<int> Dijkstra::getRutaPesos(){
+    return *rutaPesos;
+}
 
 Dijkstra::~Dijkstra()
 {

@@ -9,11 +9,14 @@ using namespace std;
 class Prim
 {
     public:
-        Prim();
+        Prim(int nodos, Matriz<ArrayList<int> *, int> *matrizPesos);
         virtual ~Prim();
         void cantidadNodos();
         void algoritmo();
         void busquedaNodoMenor();
+        ArrayList<int> getRutaInicial();
+        ArrayList<int> getRutaDestino();
+
     protected:
         int nodos;
         Matriz< ArrayList<int>*,int> *matrizPesos;
