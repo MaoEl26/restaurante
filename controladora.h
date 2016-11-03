@@ -20,10 +20,16 @@
 #include <QMessageBox>
 #include <QComboBox>
 #include <QRadioButton>
+#include <QDir>
+#include <QTextBrowser>
 
 #include "boton.h"
 #include "matriz.h"
 #include "arraylist.h"
+#include "floyd.h"
+#include "prim.h"
+#include "dijkstra.h"
+#include "kruskal.h"
 
 #include <iostream>
 using namespace std;
@@ -34,8 +40,12 @@ class Controladora : public QGraphicsView
 
 protected:
     QString filename;
+    QString path;
+
     int nodoSeleccionado;
     int cantidadNodos;
+
+    int cantidadDocs = 0;
 
     Matriz<ArrayList<int>*,int> *matrizAdyacencia;
 
@@ -46,6 +56,12 @@ public:
     void agregarBotonesJugar();
     void getDireccionArchivo();
     void menuSeleccionFunciones();
+    void dibujaGrafo();
+    void creaDocumento(QString nombre);
+
+    //Creacion de Documento de los algoritmos
+    void algoritmoDeFloydDoc(Matriz<ArrayList<int> *, int> matrizFloyd, Matriz<ArrayList<int> *, int> matrizRutas);
+    void algoritmoDeWarshallDoc();
 
     QGraphicsScene *scene;
 
@@ -61,6 +77,12 @@ public:
     QRadioButton *warshallRadio;
 
     QComboBox *menuDijkstra;
+
+    QTextBrowser *areaTexto;
+
+    QString archivo;
+
+    Floyd *floyd;
 
 
 public slots:

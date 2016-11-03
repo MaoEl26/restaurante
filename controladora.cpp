@@ -50,8 +50,10 @@ void Controladora::getDireccionArchivo(){
         QMessageBox::information(this,"Informacion",documento.errorString());
     }else{
        while(!documento.atEnd()){
+
            documento.readLine();
            cantidadNodos++;
+
        }
        documento.close();
 
@@ -76,9 +78,13 @@ void Controladora::getDireccionArchivo(){
 
        documento.close();
 
+       QStringList url = filename.split("/");
+       QString user =url[2];
+       path = "C:/Users/"+user+"/Desktop/";
+
        for(int i=0;i<cantidadNodos;i++){
            for(int j=0;j<cantidadNodos;j++){
-               cout<<matrizAdyacencia->returnPos(i)->returnPos(j);
+               cout<<matrizAdyacencia->returnPos(i)->returnPos(j)<<" ";
            }
            cout<<endl;
        }
@@ -112,6 +118,7 @@ void Controladora::menuSeleccionFunciones(){
     //Establece los estilos y lo muestra en pantalla
     dijkstraRadio->setFont(*letrasRadio);
     dijkstraRadio->setPalette(*estiloRadio);
+
     dijkstraRadio->show();
     connect(dijkstraRadio,SIGNAL(clicked(bool)),this,SLOT(checkSeleccion()));
 
@@ -170,6 +177,7 @@ void Controladora::guardaNodoDijkstra(){
         nodoSeleccionado--;
         //QMessageBox::information(this,"Informacion",menuDijkstra->currentText());
         cout<<nodoSeleccionado<<endl;
+
     }
 }
 
@@ -181,14 +189,36 @@ void Controladora::checkSeleccion(){
         menuDijkstra->setEnabled(false);
     }
     if(floydRadio->isChecked()){
+        floyd = new Floyd(cantidadNodos,matrizAdyacencia);
+        Matriz<ArrayList<int>*,int> matrizFloyd = floyd->algoritmoFloyd();
+        Matriz<ArrayList<int>*,int> matrizRutas = floyd->getMatrizRutas();
+        algoritmoDeFloydDoc(matrizFloyd,matrizRutas);
+        dibujaGrafo();
         //QMessageBox::information(this,"Informacion","Floyd");
     }
     if(primYkruskalRadio->isChecked()){
+        Kruskal(matrizAdyacencia,cantidadNodos);
         //QMessageBox::information(this,"Informacion","Prim y Kruskal");
     }
     if(warshallRadio->isChecked()){
+        algoritmoDeWarshallDoc();
         //QMessageBox::information(this,"Informacion","Cerradura Transitiva");
     }
+}
+
+void Controladora::dibujaGrafo(){
+    scene->clear();
+    dijkstraRadio->setVisible(false);
+    floydRadio->setVisible(false);
+    primYkruskalRadio->setVisible(false);
+    warshallRadio->setVisible(false);
+    menuDijkstra->setVisible(false);
+    scene->setBackgroundBrush(QBrush(QImage(":/Imagenes/fondo cuadros.png")));
+
+    areaTexto = new QTextBrowser();
+    areaTexto->setText(archivo);
+    areaTexto->setGeometry(0,100,200,400);
+    scene->addWidget(areaTexto);
 }
 
 void Controladora::startMenu(){
@@ -197,4 +227,84 @@ void Controladora::startMenu(){
 
 void Controladora::exit(){
     QCoreApplication::quit();
+}
+
+void Controladora::algoritmoDeFloydDoc
+(Matriz<ArrayList<int> *, int> matrizFloyd, Matriz<ArrayList<int> *, int> matrizRutas){
+
+    archivo = "";
+
+    archivo+="Matriz de Adyacencia \r\n";
+    for(int i = 0;i<cantidadNodos;i++){
+        if(i==nulo){
+            archivo+="       Cocina";
+        }else{
+            archivo+=" Mesa "+QString::number(i);
+        }
+    }
+    archivo+="\r\n";
+
+    for(int i=0;i<cantidadNodos;i++){
+        if(i==nulo){
+            archivo+="Cocina     ";
+        }else{
+           archivo+="Mesa "+QString::number(i)+"     ";
+        }
+        for(int j=0;j<cantidadNodos;j++){
+            archivo+=QString::number(matrizFloyd.returnPos(i)->returnPos(j))+"     ";
+        }
+        archivo+="\r\n";
+   }
+    archivo+="\r\n Matriz de Rutas \r\n";
+
+    for(int i = 0;i<cantidadNodos;i++){
+        if(i==nulo){
+            archivo+="       Cocina";
+        }else{
+            archivo+=" Mesa "+QString::number(i);
+        }
+    }
+    archivo+="\r\n";
+
+    for(int i=0;i<cantidadNodos;i++){
+
+        if(i==nulo){
+            archivo+="Cocina     ";
+        }else{
+            archivo+="Mesa "+QString::number(i)+"     ";
+        }
+
+        for(int j=0;j<cantidadNodos;j++){
+            archivo+=QString::number(matrizRutas.returnPos(i)->returnPos(j))+"     ";
+        }
+        archivo+="\r\n";
+   }
+    QString nombreArchivo= "Floyd";
+    creaDocumento(nombreArchivo);
+
+}
+
+void Controladora::algoritmoDeWarshallDoc(){
+
+}
+
+void Controladora::creaDocumento(QString nombre){
+    bool flag = true;
+    QString doc = path+nombre+".txt";
+
+    while(flag){
+        QFile documento(doc);
+        if(!documento.exists()){
+            documento.open(QIODevice::ReadWrite);
+
+            QTextStream entrada(&documento);
+            entrada<<archivo;
+            cantidadDocs=0;
+            flag=false;
+            documento.close();
+        }else{
+                cantidadDocs++;
+                doc = path+nombre+" "+QString::number(cantidadDocs)+".txt";
+        }
+    }
 }

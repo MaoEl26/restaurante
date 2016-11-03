@@ -12,6 +12,7 @@ Kruskal::Kruskal(Matriz<ArrayList<int>*,int>* matriz, int cantidadNodos){
         matrizKruskalResultado->returnPos(i)->allEqual(0);
         nodosUsados->insert(i);
     }
+    algoritmoKruskal();
 }
 
 Matriz<ArrayList<int>*,int>* Kruskal::algoritmoKruskal(){
@@ -47,9 +48,10 @@ Matriz<ArrayList<int>*,int>* Kruskal::algoritmoKruskal(){
             conexiones++;
         }
     }
+
     for(int i=0;i<nodos;i++){
            for(int j=0;j<nodos;j++){
-               cout<<matrizKruskalResultado->returnPos(i)->returnPos(j);
+               cout<<matrizKruskalResultado->returnPos(i)->returnPos(j)<<" ";
            }
            cout<<endl;
        }

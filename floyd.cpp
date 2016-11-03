@@ -4,7 +4,10 @@
 Floyd::Floyd(int nodos, Matriz<ArrayList<int> *, int> *matrizPesos){
     this->nodos=nodos;
     matrizDn = matrizPesos;
-    algoritmoFloyd();
+    matrizRutas = new Matriz<ArrayList<int>*,int>(nodos);
+    for(int i=0;i<nodos;i++){
+        matrizRutas->returnPos(i)->allEqual(0);
+    }
 }
 
 Matriz<ArrayList<int> *, int> Floyd::algoritmoFloyd(){
@@ -21,11 +24,16 @@ Matriz<ArrayList<int> *, int> Floyd::algoritmoFloyd(){
                         if (valorColumna != infinito){
                             valorActual = matrizDn->returnPos(i)->returnPos(j);
                             if(valorActual != infinito){
-                                    matrizDn->returnPos(i)->remove(j);
-                                    matrizDn->insert(i,j,min(valorActual,(valorFila+valorColumna)));
+                                    int minimo=min(valorActual,(valorFila+valorColumna));
+                                    if (minimo!=valorActual){
+                                        matrizDn->returnPos(i)->remove(j);
+                                        matrizDn->insert(i,j,minimo);
+                                        matrizRutas->returnPos(i)->setValue(j,k+1);
+                                    }
                             }else{
                                 matrizDn->returnPos(i)->remove(j);
                                 matrizDn->insert(i,j,(valorFila+valorColumna));
+                                matrizRutas->returnPos(i)->setValue(j,k+1);
                             }
                         }
                     }
@@ -33,9 +41,13 @@ Matriz<ArrayList<int> *, int> Floyd::algoritmoFloyd(){
             }
         }
      }
+
      return *matrizDn;
 }
 
+Matriz<ArrayList<int> *, int> Floyd::getMatrizRutas(){
+    return *matrizRutas;
+}
 
 Floyd::~Floyd()
 {
