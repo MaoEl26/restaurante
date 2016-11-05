@@ -7,6 +7,7 @@ class Matriz
 {
     public:
         Matriz(int pMax);
+        Matriz(int maxMatriz,int maxArray);
         void cambiarFila(int pos);
         E returnPos(int position);
         void insert(int fila,int columna,V valor);
@@ -15,7 +16,7 @@ class Matriz
     protected:
 
     private:
-        void insertArray();
+        void insertArray(int maxArray);
         int size;
         int max;
         int pos;

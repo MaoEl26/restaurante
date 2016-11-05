@@ -22,6 +22,7 @@
 #include <QRadioButton>
 #include <QDir>
 #include <QTextBrowser>
+#include <QTextEdit>
 
 #include "boton.h"
 #include "matriz.h"
@@ -41,13 +42,19 @@ class Controladora : public QGraphicsView
 protected:
     QString filename;
     QString path;
+    QString nombreArchivo;
+    QString archivo;
 
     int nodoSeleccionado;
     int cantidadNodos;
+    int cantidadMesas;
 
     int cantidadDocs = 0;
 
     Matriz<ArrayList<int>*,int> *matrizAdyacencia;
+
+    ArrayList<int> *arrayCoordenasX;
+    ArrayList<int> *arrayCoordenasY;
 
 public:
     Controladora();
@@ -57,30 +64,37 @@ public:
     void getDireccionArchivo();
     void menuSeleccionFunciones();
     void dibujaGrafo();
-    void creaDocumento(QString nombre);
+    void agregaNodos();
+    void creaDocumento();
 
     //Creacion de Documento de los algoritmos
     void algoritmoDeFloydDoc(Matriz<ArrayList<int> *, int> matrizFloyd, Matriz<ArrayList<int> *, int> matrizRutas);
-    void algoritmoDeWarshallDoc();
+    void algoritmoDocumentos();
 
     QGraphicsScene *scene;
 
     QFont *letrasRadio;
     QPalette *estiloRadio;
+    QPainter *lapiz;
 
-    Boton *startButton;
-    Boton *exitButton;
+    QLabel *mesas;
+
+    Boton *inicioBoton;
+    Boton *salirBoton;
+    Boton *atrasBoton;
+    Boton *generaDocumento;
+
 
     QRadioButton *dijkstraRadio;
     QRadioButton *floydRadio;
-    QRadioButton *primYkruskalRadio;
+    QRadioButton *primRadio;
+    QRadioButton *kruskalRadio;
     QRadioButton *warshallRadio;
+
 
     QComboBox *menuDijkstra;
 
-    QTextBrowser *areaTexto;
-
-    QString archivo;
+    QTextEdit *areaTexto;
 
     Floyd *floyd;
 
@@ -91,6 +105,9 @@ public slots:
         void exit();
         void checkSeleccion();
         void guardaNodoDijkstra();
+        void retroceder();
+        void generadorDocumento();
+
 };
 
 #endif // CONTROLADORA_H

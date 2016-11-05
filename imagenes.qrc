@@ -6,5 +6,6 @@
         <file>Imagenes/B_SALIR.png</file>
         <file>Imagenes/fondoMenuSeleccion.jpg</file>
         <file>Imagenes/mesa.png</file>
+        <file>Imagenes/cocina.png</file>
     </qresource>
 </RCC>
