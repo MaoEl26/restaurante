@@ -1,11 +1,13 @@
 <RCC>
     <qresource prefix="/">
-        <file>Imagenes/fondo cuadros.png</file>
         <file>Imagenes/fondo_Menu.jpg</file>
         <file>Imagenes/B_INICIO.png</file>
         <file>Imagenes/B_SALIR.png</file>
         <file>Imagenes/fondoMenuSeleccion.jpg</file>
         <file>Imagenes/mesa.png</file>
         <file>Imagenes/cocina.png</file>
+        <file>Imagenes/B_GUARDAR.png</file>
+        <file>Imagenes/B_ATRAS.png</file>
+        <file>Imagenes/fondo cuadros.png</file>
     </qresource>
 </RCC>

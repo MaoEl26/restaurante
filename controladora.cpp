@@ -243,13 +243,13 @@ void Controladora::dibujaGrafo(){
     areaTexto->setReadOnly(true);
     areaTexto->show();
 
-    generaDocumento = new Boton(":/Imagenes/B_INICIO.png");
+    generaDocumento = new Boton(":/Imagenes/B_GUARDAR.png");
     generaDocumento->setPos(0,560);
     generaDocumento->setScale(1.3);
     connect(generaDocumento,SIGNAL(clicked()),this,SLOT(generadorDocumento()));
     scene->addItem(generaDocumento);
 
-    atrasBoton = new Boton(":/Imagenes/B_SALIR.png");
+    atrasBoton = new Boton(":/Imagenes/B_ATRAS.png");
     atrasBoton->setPos(0,610);
     atrasBoton->setScale(1.3);
     connect(atrasBoton,SIGNAL(clicked()),this,SLOT(retroceder()));
