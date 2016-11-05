@@ -2,6 +2,7 @@
 
 #define nulo 0
 #define filasMatriz 5
+#define columnasMatriz 10
 
 
 Controladora::Controladora()
@@ -257,7 +258,7 @@ void Controladora::dibujaGrafo(){
 
     cantidadMesas = 0;
 
-
+    matrizUbicaciones = new Matriz<ArrayList<int>*,int>(filasMatriz,columnasMatriz);
     arrayCoordenasX = new ArrayList<int>(cantidadNodos);
     arrayCoordenasY = new ArrayList<int>(cantidadNodos);
     agregaNodos();
@@ -266,11 +267,12 @@ void Controladora::dibujaGrafo(){
 void Controladora::agregaNodos(){
 
     for(int i=0;i<filasMatriz;i++){
+        matrizUbicaciones->returnPos(i)->allEqual(-1);
         arrayCoordenasX->allEqual(-1);
         arrayCoordenasY->allEqual(-1);
     }
 
-    int coorXCocina = 1;
+    int coorXCocina = 18;
     int coorYCocina = 200;
 
     QImage mesa(":/Imagenes/cocina.png");
@@ -280,17 +282,19 @@ void Controladora::agregaNodos(){
     scene->addItem(itemMesa);
 
     int coorX = 172;
-
-    while(cantidadMesas<cantidadNodos)
-    {
+    int i=0;
+    while(cantidadMesas<cantidadNodos){
         int coorY = 58;
+
         for(int j=0;j<5;j++){
 
             if(cantidadMesas==0&&j==0){
+                matrizUbicaciones->returnPos(j)->setValue(i,cantidadMesas);
                 arrayCoordenasX->setValue(cantidadMesas,coorXCocina);
                 arrayCoordenasY->setValue(cantidadMesas,coorYCocina);
                 coorY+=113;
             }else{
+                matrizUbicaciones->returnPos(j)->setValue(i,cantidadMesas);
                 arrayCoordenasX->setValue(cantidadMesas,coorX);
                 arrayCoordenasY->setValue(cantidadMesas,coorY);
                 QImage mesa(":/Imagenes/mesa.png");
@@ -306,12 +310,40 @@ void Controladora::agregaNodos(){
             }
         }
         coorX+=113;
+        i++;
     }
 
     for(int i = 0;i<cantidadNodos;i++){
         cout<<"x"<<arrayCoordenasX->returnPos(i)<<" ";
         cout<<"y"<<arrayCoordenasY->returnPos(i)<<" ";
+        cout<<endl;
     }
+    for(int i=0;i<filasMatriz;i++){
+        for(int j=0;j<columnasMatriz;j++){
+            cout<<matrizUbicaciones->returnPos(i)->returnPos(j)<<" ";
+        }
+        cout<<endl;
+
+    }
+    pen = new QPen ();
+    pen->setColor(Qt::black);
+    pen->setWidth(6);
+    dibujaLinea(0,2);
+}
+
+void Controladora::controlDibujo(ArrayList<int> *nodosInicio, ArrayList<int> *nodosDestino){
+
+}
+
+void Controladora::dibujaLinea(int nodoInicio,int nodoDestino){
+
+
+    line = scene->addLine(arrayCoordenasX->returnPos(nodoInicio)+5,arrayCoordenasY->returnPos(nodoInicio)+25,
+                          arrayCoordenasX->returnPos(nodoDestino)-5,arrayCoordenasY->returnPos(nodoDestino)+25,*pen);
+    line = scene->addLine(arrayCoordenasX->returnPos(2)-5,arrayCoordenasY->returnPos(2)+25,
+                          arrayCoordenasX->returnPos(4)-5,arrayCoordenasY->returnPos(4)+25,*pen);
+    line = scene->addLine(arrayCoordenasX->returnPos(4)-5,arrayCoordenasY->returnPos(4)+60,
+                          arrayCoordenasX->returnPos(9)-5,arrayCoordenasY->returnPos(9)+60,*pen);
 }
 
 void Controladora::retroceder(){

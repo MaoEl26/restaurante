@@ -52,6 +52,7 @@ protected:
     int cantidadDocs = 0;
 
     Matriz<ArrayList<int>*,int> *matrizAdyacencia;
+    Matriz<ArrayList<int>*,int> *matrizUbicaciones;
 
     ArrayList<int> *arrayCoordenasX;
     ArrayList<int> *arrayCoordenasY;
@@ -66,16 +67,19 @@ public:
     void dibujaGrafo();
     void agregaNodos();
     void creaDocumento();
+    void dibujaLinea(int nodoInicio,int nodoDestino);
+    void controlDibujo(ArrayList<int> *nodosInicio,ArrayList<int> *nodosDestino);
 
     //Creacion de Documento de los algoritmos
     void algoritmoDeFloydDoc(Matriz<ArrayList<int> *, int> matrizFloyd, Matriz<ArrayList<int> *, int> matrizRutas);
     void algoritmoDocumentos();
 
     QGraphicsScene *scene;
+    QGraphicsLineItem *line;
 
     QFont *letrasRadio;
     QPalette *estiloRadio;
-    QPainter *lapiz;
+    QPen *pen;
 
     QLabel *mesas;
 
