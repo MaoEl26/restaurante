@@ -20,10 +20,11 @@
 #include <QMessageBox>
 #include <QComboBox>
 #include <QRadioButton>
-#include <QDir>
 #include <QTextBrowser>
 #include <QTextEdit>
 
+
+#include <time.h>
 #include "boton.h"
 #include "matriz.h"
 #include "arraylist.h"
@@ -45,13 +46,18 @@ protected:
     QString nombreArchivo;
     QString archivo;
 
-    int nodoSeleccionado;
+    int nodoInicioSeleccionado;
+    int nodoDestinoSeleccionado;
+
     int cantidadNodos;
     int cantidadMesas;
+
+    QTimer *timer;
 
     int cantidadDocs = 0;
 
     Matriz<ArrayList<int>*,int> *matrizAdyacencia;
+    Matriz<ArrayList<int>*,int> *matrizUbicaciones;
 
     ArrayList<int> *arrayCoordenasX;
     ArrayList<int> *arrayCoordenasY;
@@ -66,16 +72,24 @@ public:
     void dibujaGrafo();
     void agregaNodos();
     void creaDocumento();
+    void dibujaLinea(int nodoInicio,int nodoDestino);
+    void deleteEtiquetas();
+    void controlDibujo(ArrayList<int> nodosInicio, ArrayList<int> nodosDestino);
+    void controlDibujo(ArrayList<int> nodos);
+    //delay();
+
+    int buscaNodo(int nodo,bool llave);
 
     //Creacion de Documento de los algoritmos
     void algoritmoDeFloydDoc(Matriz<ArrayList<int> *, int> matrizFloyd, Matriz<ArrayList<int> *, int> matrizRutas);
     void algoritmoDocumentos();
 
     QGraphicsScene *scene;
+    QGraphicsLineItem *line;
 
     QFont *letrasRadio;
     QPalette *estiloRadio;
-    QPainter *lapiz;
+    QPen *pen;
 
     QLabel *mesas;
 
@@ -84,7 +98,6 @@ public:
     Boton *atrasBoton;
     Boton *generaDocumento;
 
-
     QRadioButton *dijkstraRadio;
     QRadioButton *floydRadio;
     QRadioButton *primRadio;
@@ -92,11 +105,13 @@ public:
     QRadioButton *warshallRadio;
 
 
-    QComboBox *menuDijkstra;
+    QComboBox *menuInicioDijkstra;
+    QComboBox *menuDestinoDijkstra;
 
     QTextEdit *areaTexto;
 
     Floyd *floyd;
+    Dijkstra *dijkstra;
 
 
 public slots:
@@ -104,7 +119,8 @@ public slots:
         void startMenu();
         void exit();
         void checkSeleccion();
-        void guardaNodoDijkstra();
+        void guardaNodoInicioDijkstra();
+        void guardaNodoDestinoDijkstra();
         void retroceder();
         void generadorDocumento();
 
