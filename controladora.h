@@ -20,10 +20,11 @@
 #include <QMessageBox>
 #include <QComboBox>
 #include <QRadioButton>
-#include <QDir>
 #include <QTextBrowser>
 #include <QTextEdit>
 
+
+#include <time.h>
 #include "boton.h"
 #include "matriz.h"
 #include "arraylist.h"
@@ -48,6 +49,7 @@ protected:
     int nodoSeleccionado;
     int cantidadNodos;
     int cantidadMesas;
+    QTimer *timer;
 
     int cantidadDocs = 0;
 
@@ -68,7 +70,12 @@ public:
     void agregaNodos();
     void creaDocumento();
     void dibujaLinea(int nodoInicio,int nodoDestino);
-    void controlDibujo(ArrayList<int> *nodosInicio,ArrayList<int> *nodosDestino);
+    void deleteEtiquetas();
+    void controlDibujo(ArrayList<int> nodosInicio, ArrayList<int> nodosDestino);
+    void controlDibujo(ArrayList<int> *nodos);
+    //delay();
+
+    int buscaNodo(int nodo,bool llave);
 
     //Creacion de Documento de los algoritmos
     void algoritmoDeFloydDoc(Matriz<ArrayList<int> *, int> matrizFloyd, Matriz<ArrayList<int> *, int> matrizRutas);
@@ -87,7 +94,6 @@ public:
     Boton *salirBoton;
     Boton *atrasBoton;
     Boton *generaDocumento;
-
 
     QRadioButton *dijkstraRadio;
     QRadioButton *floydRadio;
