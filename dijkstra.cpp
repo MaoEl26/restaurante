@@ -3,11 +3,12 @@
 #define infinito -1
 #define vacio -300
 
-Dijkstra::Dijkstra(int nodos, int nodoBusqueda, Matriz<ArrayList<int> *, int> *matrizPesos)
+Dijkstra::Dijkstra(int nodos, int nodoBusqueda,int nodoDestino, Matriz<ArrayList<int> *, int> *matrizPesos)
 {
     this->matrizPesos= matrizPesos; //Matriz de pesos original
     this->nodos= nodos; //Cantidad de nodos
     this->nodoBusqueda = nodoBusqueda; //Nodo inicial con el cual se va realizar la matriz de dijsktra
+    this->nodoDestino= nodoDestino;
     matrizPesosDijkstra = new Matriz< ArrayList<int>*,int>(nodos); //Guardara los valores de la matriz de dijkstra
     pesosMenores= new ArrayList<int>(nodos); //Guardara los pesos de los nodos menores q se representan con un cuadro en la matriz
     posicionMenores= new ArrayList<int>(nodos);//Guardara los nodos menores q se representan con un cuadro en la matriz
@@ -125,7 +126,7 @@ void Dijkstra::algoritmo(){
     for(int g =0 ; g<nodos;g++){
         if(pesosMenores->returnPos(g)== vacio){
 
-            nodoMayorDistancia=g;
+            nodoMayorDistancia=nodoDestino;
             pesosMenores->remove(g);
             pesosMenores->goToPos(g);
             pesosMenores->insert
@@ -199,8 +200,7 @@ void Dijkstra::ruta(){
             encontrado= true;
         }
     }
-    rutaNodo->setValue(columna,posicionMenores->returnPos(nodoPosicion));
-    rutaPesos->setValue(columna,0);
+
 }
 
 ArrayList<int> Dijkstra::getRutaNodo(){

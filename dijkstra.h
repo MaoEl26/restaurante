@@ -9,7 +9,7 @@ using namespace std;
 class Dijkstra
 {
     public:
-        Dijkstra(int nodos, int nodoBusqueda ,Matriz< ArrayList<int>*,int> *matrizPesos);
+        Dijkstra(int nodos, int nodoBusqueda , int nodoDestino, Matriz< ArrayList<int>*,int> *matrizPesos);
         virtual ~Dijkstra();
         void algoritmo();
         void cantidadNodos();
@@ -30,6 +30,7 @@ class Dijkstra
         int busquedaNodoMenor(int fila);
         int nodoMayorDistancia;
         int nodoBusqueda;
+        int nodoDestino;
 
     private:
 };
