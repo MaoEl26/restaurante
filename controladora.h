@@ -46,9 +46,12 @@ protected:
     QString nombreArchivo;
     QString archivo;
 
-    int nodoSeleccionado;
+    int nodoInicioSeleccionado;
+    int nodoDestinoSeleccionado;
+
     int cantidadNodos;
     int cantidadMesas;
+
     QTimer *timer;
 
     int cantidadDocs = 0;
@@ -72,7 +75,7 @@ public:
     void dibujaLinea(int nodoInicio,int nodoDestino);
     void deleteEtiquetas();
     void controlDibujo(ArrayList<int> nodosInicio, ArrayList<int> nodosDestino);
-    void controlDibujo(ArrayList<int> *nodos);
+    void controlDibujo(ArrayList<int> nodos);
     //delay();
 
     int buscaNodo(int nodo,bool llave);
@@ -102,11 +105,13 @@ public:
     QRadioButton *warshallRadio;
 
 
-    QComboBox *menuDijkstra;
+    QComboBox *menuInicioDijkstra;
+    QComboBox *menuDestinoDijkstra;
 
     QTextEdit *areaTexto;
 
     Floyd *floyd;
+    Dijkstra *dijkstra;
 
 
 public slots:
@@ -114,7 +119,8 @@ public slots:
         void startMenu();
         void exit();
         void checkSeleccion();
-        void guardaNodoDijkstra();
+        void guardaNodoInicioDijkstra();
+        void guardaNodoDestinoDijkstra();
         void retroceder();
         void generadorDocumento();
 

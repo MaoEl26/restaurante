@@ -169,61 +169,95 @@ void Controladora::menuSeleccionFunciones(){
     connect(warshallRadio,SIGNAL(clicked(bool)),this,SLOT(checkSeleccion()));
 
     //Menu de nodos a seleccionar Dijkstra
-    menuDijkstra = new QComboBox(this);
-    menuDijkstra->setGeometry(700,260,75,25);
-    menuDijkstra->setEnabled(false);
-    menuDijkstra->addItem("");//0
+    menuInicioDijkstra = new QComboBox(this);
+    menuInicioDijkstra->setGeometry(700,240,75,25);
+    menuInicioDijkstra->setEnabled(false);
+    menuInicioDijkstra->addItem("");//0
+
+    menuDestinoDijkstra = new QComboBox(this);
+    menuDestinoDijkstra->setGeometry(700,270,75,25);
+    menuDestinoDijkstra->setEnabled(false);
+    menuDestinoDijkstra->addItem("");//0
 
     for(int i =0;i<cantidadNodos;i++){
         if(i==nulo){
-            menuDijkstra->addItem("Cocina");
+            menuDestinoDijkstra->addItem("Cocina");
+            menuInicioDijkstra->addItem("Cocina");
         }else{
-            menuDijkstra->addItem("Mesa "+QString::number(i));
+            menuInicioDijkstra->addItem("Mesa "+QString::number(i));
+            menuDestinoDijkstra->addItem("Mesa "+QString::number(i));
         }
     }
-    menuDijkstra->show();
+    menuInicioDijkstra->show();
+    menuDestinoDijkstra->show();
 
-    connect(menuDijkstra,SIGNAL(activated(QString)),this,SLOT(guardaNodoDijkstra()));
+    connect(menuInicioDijkstra,SIGNAL(activated(QString)),this,SLOT(guardaNodoInicioDijkstra()));
+    connect(menuDestinoDijkstra,SIGNAL(activated(QString)),this,SLOT(guardaNodoDestinoDijkstra()));
 
 }
 
-void Controladora::guardaNodoDijkstra(){
-    nodoSeleccionado = menuDijkstra->currentIndex();
-    if(nodoSeleccionado != nulo){
-        nodoSeleccionado--;
+void Controladora::guardaNodoInicioDijkstra(){
 
+    nodoInicioSeleccionado = menuInicioDijkstra->currentIndex();
 
-        nombreArchivo= dijkstraRadio->text();
-        dibujaGrafo();
+    if(nodoInicioSeleccionado != nulo){
+
+        nodoInicioSeleccionado--;
+
+        menuDestinoDijkstra->setEnabled(true);
 
         //QMessageBox::information(this,"Informacion",menuDijkstra->currentText());
-        cout<<nodoSeleccionado<<endl;
+        cout<<"inicio "<<nodoInicioSeleccionado<<endl;
+    }
+}
 
+void Controladora::guardaNodoDestinoDijkstra(){
+    nodoDestinoSeleccionado = menuDestinoDijkstra->currentIndex();
+
+    if(nodoDestinoSeleccionado != nulo){
+        nombreArchivo= dijkstraRadio->text();
+
+        nodoDestinoSeleccionado--;
+
+        dibujaGrafo();
+
+        dijkstra = new Dijkstra(cantidadNodos,nodoInicioSeleccionado,nodoDestinoSeleccionado,matrizAdyacencia);
+
+        //QMessageBox::information(this,"Informacion",menuDijkstra->currentText());
+        cout<<"Destino "<<nodoDestinoSeleccionado<<endl;
+
+        controlDibujo(dijkstra->getRutaNodo());
     }
 }
 
 void Controladora::checkSeleccion(){
     if(dijkstraRadio->isChecked()){
-        menuDijkstra->setEnabled(true);
+        menuInicioDijkstra->setEnabled(true);
     }else{
-        menuDijkstra->setEnabled(false);
+        menuInicioDijkstra->setEnabled(false);
+        menuDestinoDijkstra->setEnabled(false);
     }
     if(floydRadio->isChecked()){
-        floyd = new Floyd(cantidadNodos,matrizAdyacencia);
 
+        nombreArchivo= floydRadio->text();
+
+        floyd = new Floyd(cantidadNodos,matrizAdyacencia);
         Matriz<ArrayList<int>*,int> matrizFloyd = floyd->algoritmoFloyd();
         Matriz<ArrayList<int>*,int> matrizRutas = floyd->getMatrizRutas();
+
         algoritmoDeFloydDoc(matrizFloyd,matrizRutas);
-        nombreArchivo= floydRadio->text();
+
         dibujaGrafo();
     }
     if(primRadio->isChecked()){
+
         nombreArchivo= primRadio->text();
         dibujaGrafo();
         Prim *alPrim = new Prim(cantidadNodos,matrizAdyacencia);
         controlDibujo(alPrim->getRutaInicial(),alPrim->getRutaDestino());
     }
     if (kruskalRadio->isChecked()){
+
         nombreArchivo= kruskalRadio->text();
         dibujaGrafo();
     }
@@ -233,6 +267,7 @@ void Controladora::checkSeleccion(){
         dibujaGrafo();
     }
 }
+
 void Controladora::deleteEtiquetas(){
 
     dijkstraRadio->setVisible(false);
@@ -240,14 +275,16 @@ void Controladora::deleteEtiquetas(){
     primRadio->setVisible(false);
     kruskalRadio->setVisible(false);
     warshallRadio->setVisible(false);
-    menuDijkstra->setVisible(false);
+    menuInicioDijkstra->setVisible(false);
+    menuDestinoDijkstra->setVisible(false);
 
     dijkstraRadio->deleteLater();
     floydRadio->deleteLater();
     primRadio->deleteLater();
     kruskalRadio->deleteLater();
     warshallRadio->deleteLater();
-    menuDijkstra->deleteLater();
+    menuInicioDijkstra->deleteLater();
+    menuDestinoDijkstra->deleteLater();
 }
 
 void Controladora::dibujaGrafo(){
@@ -377,11 +414,26 @@ void Controladora::controlDibujo(ArrayList<int> nodosInicio, ArrayList<int> nodo
         }
 }
 
+void Controladora::controlDibujo(ArrayList<int> nodos){
+    srand(time(NULL));
 
-void Controladora::controlDibujo(ArrayList<int> *nodos){
+    for(int i=cantidadNodos-1;i>0;i--){
+       int nodoInicio = nodos.returnPos(i);
+        int nodoDestino = nodos.returnPos(i-1);
+        if(nodoDestino != -1 && nodoInicio != -1){
+            cout<<"entra"<<nodoInicio<<" "<<nodoDestino<<endl;
+            int r = rand() % (255);
+            int g = rand() % (255);
+            int b = rand() % (255);
 
+            QColor color(r,g,b);
+            pen->setColor(color);
+
+            dibujaLinea(nodoInicio,nodoDestino);
+            delay();
+        }
+    }
 }
-
 
 void Controladora::dibujaLinea(int nodoInicio,int nodoDestino){
 
@@ -431,8 +483,6 @@ void Controladora::dibujaLinea(int nodoInicio,int nodoDestino){
 }
         line = scene->addLine(coorXInicio,coorYInicio,
                               coorXDestino ,arrayCoordenasY->returnPos(nodoDestino)+60.5,*pen);
-
-
 }
 
 void Controladora::retroceder(){
