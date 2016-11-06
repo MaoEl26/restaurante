@@ -10,6 +10,7 @@ class Warshall
         Warshall(int nodos,Matriz<ArrayList<int> *, int> *matriz);
         void convertirMatriz();
         void algoritmo ();
+        Matriz<ArrayList<int>*,int> getMatriz();
         virtual ~Warshall();
 
     protected:

@@ -29,7 +29,6 @@ void Warshall::convertirMatriz(){
 void Warshall::algoritmo(){
 
         for(int k = 0; k < nodos; k++){
-                cout<<endl;
             for(int i = 0; i < nodos; i++){
                 for(int j = 0; j < nodos; j++){
                     if(matrizAdyacencia->returnPos(i)->returnPos(j) == 1 ||
@@ -40,6 +39,10 @@ void Warshall::algoritmo(){
                 }
             }
         }
+}
+
+Matriz<ArrayList<int>*,int> Warshall::getMatriz(){
+    return *matrizAdyacencia;
 }
 
 Warshall::~Warshall()

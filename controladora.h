@@ -32,6 +32,7 @@
 #include "prim.h"
 #include "dijkstra.h"
 #include "kruskal.h"
+#include "warshall.h"
 
 #include <iostream>
 using namespace std;
@@ -81,8 +82,10 @@ public:
     int buscaNodo(int nodo,bool llave);
 
     //Creacion de Documento de los algoritmos
-    void algoritmoDeFloydDoc(Matriz<ArrayList<int> *, int> matrizFloyd, Matriz<ArrayList<int> *, int> matrizRutas);
-    void algoritmoDocumentos();
+    void algoritmoDocumentos(Matriz<ArrayList<int> *, int> matrizFloyd, Matriz<ArrayList<int> *, int> matrizRutas);
+    void algoritmoDocumentos(ArrayList<int> nodosRutas);
+    void algoritmoDocumentos(ArrayList<int> nodosInicio,ArrayList<int> nodosDestino);
+    void algoritmoDocumentos(Matriz<ArrayList<int> *, int> matriz);
 
     QGraphicsScene *scene;
     QGraphicsLineItem *line;
@@ -122,6 +125,7 @@ public slots:
         void guardaNodoInicioDijkstra();
         void guardaNodoDestinoDijkstra();
         void retroceder();
+        void retrocederMenuPrincipal();
         void generadorDocumento();
 
 };
