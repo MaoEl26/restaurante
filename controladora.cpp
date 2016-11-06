@@ -1,10 +1,9 @@
 #include "controladora.h"
-#include <QTime>
-#include <QApplication>
 
 #define nulo 0
 #define filasMatriz 5
-#define columnasMatriz 10
+#include <QTime>
+#include<QApplication>
 
 
 Controladora::Controladora()
@@ -13,12 +12,12 @@ Controladora::Controladora()
     agregarBotonesJugar();
     show();
 }
-void delay(){
-    QTime dieTime= QTime::currentTime().addSecs(4);
+void delay()
+{
+    QTime dieTime= QTime::currentTime().addSecs(1);
     while (QTime::currentTime() < dieTime)
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 }
-
 void Controladora::ambiente(){
     //Crea la ventana donde se crearan los elementos
     scene = new QGraphicsScene();
@@ -152,7 +151,7 @@ void Controladora::menuSeleccionFunciones(){
 
     //Algoritmo de Prim y Kruskal
     kruskalRadio = new QRadioButton("Kruskal",this);
-    kruskalRadio->setGeometry(490,370,600,100);//Ingresa las coordenadas y las dimensiones del radio
+    kruskalRadio->setGeometry(490,320,600,100);//Ingresa las coordenadas y las dimensiones del radio
     //Establece los estilos y lo muestra en pantalla
     kruskalRadio->setFont(*letrasRadio);
     kruskalRadio->setPalette(*estiloRadio);
@@ -161,7 +160,7 @@ void Controladora::menuSeleccionFunciones(){
 
     //Algoritmo de Warshall
     warshallRadio = new QRadioButton("Warshall",this);
-    warshallRadio->setGeometry(490,420,600,100);//Ingresa las coordenadas y las dimensiones del radio
+    warshallRadio->setGeometry(490,370,600,100);//Ingresa las coordenadas y las dimensiones del radio
     //Establece los estilos y lo muestra en pantalla
     warshallRadio->setFont(*letrasRadio);
     warshallRadio->setPalette(*estiloRadio);
@@ -169,95 +168,60 @@ void Controladora::menuSeleccionFunciones(){
     connect(warshallRadio,SIGNAL(clicked(bool)),this,SLOT(checkSeleccion()));
 
     //Menu de nodos a seleccionar Dijkstra
-    menuInicioDijkstra = new QComboBox(this);
-    menuInicioDijkstra->setGeometry(700,240,75,25);
-    menuInicioDijkstra->setEnabled(false);
-    menuInicioDijkstra->addItem("");//0
-
-    menuDestinoDijkstra = new QComboBox(this);
-    menuDestinoDijkstra->setGeometry(700,270,75,25);
-    menuDestinoDijkstra->setEnabled(false);
-    menuDestinoDijkstra->addItem("");//0
+    menuDijkstra = new QComboBox(this);
+    menuDijkstra->setGeometry(700,260,75,25);
+    menuDijkstra->setEnabled(false);
+    menuDijkstra->addItem("");//0
 
     for(int i =0;i<cantidadNodos;i++){
         if(i==nulo){
-            menuDestinoDijkstra->addItem("Cocina");
-            menuInicioDijkstra->addItem("Cocina");
+            menuDijkstra->addItem("Cocina");
         }else{
-            menuInicioDijkstra->addItem("Mesa "+QString::number(i));
-            menuDestinoDijkstra->addItem("Mesa "+QString::number(i));
+            menuDijkstra->addItem("Mesa "+QString::number(i));
         }
     }
-    menuInicioDijkstra->show();
-    menuDestinoDijkstra->show();
+    menuDijkstra->show();
 
-    connect(menuInicioDijkstra,SIGNAL(activated(QString)),this,SLOT(guardaNodoInicioDijkstra()));
-    connect(menuDestinoDijkstra,SIGNAL(activated(QString)),this,SLOT(guardaNodoDestinoDijkstra()));
+    connect(menuDijkstra,SIGNAL(activated(QString)),this,SLOT(guardaNodoDijkstra()));
 
 }
 
-void Controladora::guardaNodoInicioDijkstra(){
+void Controladora::guardaNodoDijkstra(){
+    nodoSeleccionado = menuDijkstra->currentIndex();
+    if(nodoSeleccionado != nulo){
+        nodoSeleccionado--;
 
-    nodoInicioSeleccionado = menuInicioDijkstra->currentIndex();
 
-    if(nodoInicioSeleccionado != nulo){
-
-        nodoInicioSeleccionado--;
-
-        menuDestinoDijkstra->setEnabled(true);
-
-        //QMessageBox::information(this,"Informacion",menuDijkstra->currentText());
-        cout<<"inicio "<<nodoInicioSeleccionado<<endl;
-    }
-}
-
-void Controladora::guardaNodoDestinoDijkstra(){
-    nodoDestinoSeleccionado = menuDestinoDijkstra->currentIndex();
-
-    if(nodoDestinoSeleccionado != nulo){
         nombreArchivo= dijkstraRadio->text();
-
-        nodoDestinoSeleccionado--;
-
         dibujaGrafo();
 
-        dijkstra = new Dijkstra(cantidadNodos,nodoInicioSeleccionado,nodoDestinoSeleccionado,matrizAdyacencia);
-
         //QMessageBox::information(this,"Informacion",menuDijkstra->currentText());
-        cout<<"Destino "<<nodoDestinoSeleccionado<<endl;
+        cout<<nodoSeleccionado<<endl;
 
-        controlDibujo(dijkstra->getRutaNodo());
     }
 }
 
 void Controladora::checkSeleccion(){
     if(dijkstraRadio->isChecked()){
-        menuInicioDijkstra->setEnabled(true);
+        menuDijkstra->setEnabled(true);
     }else{
-        menuInicioDijkstra->setEnabled(false);
-        menuDestinoDijkstra->setEnabled(false);
+        menuDijkstra->setEnabled(false);
     }
     if(floydRadio->isChecked()){
-
-        nombreArchivo= floydRadio->text();
-
         floyd = new Floyd(cantidadNodos,matrizAdyacencia);
+
         Matriz<ArrayList<int>*,int> matrizFloyd = floyd->algoritmoFloyd();
         Matriz<ArrayList<int>*,int> matrizRutas = floyd->getMatrizRutas();
-
         algoritmoDeFloydDoc(matrizFloyd,matrizRutas);
-
+        nombreArchivo= floydRadio->text();
         dibujaGrafo();
     }
     if(primRadio->isChecked()){
-
         nombreArchivo= primRadio->text();
         dibujaGrafo();
-        Prim *alPrim = new Prim(cantidadNodos,matrizAdyacencia);
-        controlDibujo(alPrim->getRutaInicial(),alPrim->getRutaDestino());
+        Kruskal(matrizAdyacencia,cantidadNodos);
     }
     if (kruskalRadio->isChecked()){
-
         nombreArchivo= kruskalRadio->text();
         dibujaGrafo();
     }
@@ -268,33 +232,15 @@ void Controladora::checkSeleccion(){
     }
 }
 
-void Controladora::deleteEtiquetas(){
-
-    dijkstraRadio->setVisible(false);
-    floydRadio->setVisible(false);
-    primRadio->setVisible(false);
-    kruskalRadio->setVisible(false);
-    warshallRadio->setVisible(false);
-    menuInicioDijkstra->setVisible(false);
-    menuDestinoDijkstra->setVisible(false);
+void Controladora::dibujaGrafo(){
+    scene->clear();
 
     dijkstraRadio->deleteLater();
     floydRadio->deleteLater();
     primRadio->deleteLater();
     kruskalRadio->deleteLater();
     warshallRadio->deleteLater();
-    menuInicioDijkstra->deleteLater();
-    menuDestinoDijkstra->deleteLater();
-}
-
-void Controladora::dibujaGrafo(){
-    scene->clear();
-
-    pen = new QPen ();
-
-    pen->setWidth(6);
-
-    deleteEtiquetas();
+    menuDijkstra->deleteLater();
 
     scene->setBackgroundBrush(QBrush(QImage(":/Imagenes/fondo cuadros.png")));
 
@@ -318,22 +264,21 @@ void Controladora::dibujaGrafo(){
 
     cantidadMesas = 0;
 
-    matrizUbicaciones = new Matriz<ArrayList<int>*,int>(filasMatriz,columnasMatriz);
-    arrayCoordenasX = new ArrayList<int>(50);
-    arrayCoordenasY = new ArrayList<int>(50);
+
+    arrayCoordenasX = new ArrayList<int>(cantidadNodos);
+    arrayCoordenasY = new ArrayList<int>(cantidadNodos);
     agregaNodos();
 }
 
 void Controladora::agregaNodos(){
 
     for(int i=0;i<filasMatriz;i++){
-        matrizUbicaciones->returnPos(i)->allEqual(-1);
         arrayCoordenasX->allEqual(-1);
         arrayCoordenasY->allEqual(-1);
     }
 
-    int coorXCocina = 18;
-    int coorYCocina = 170;
+    int coorXCocina = 1;
+    int coorYCocina = 200;
 
     QImage mesa(":/Imagenes/cocina.png");
     QGraphicsPixmapItem *itemMesa= new QGraphicsPixmapItem( QPixmap::fromImage(mesa));
@@ -342,19 +287,17 @@ void Controladora::agregaNodos(){
     scene->addItem(itemMesa);
 
     int coorX = 172;
-    int i=0;
-    while(cantidadMesas<cantidadNodos){
-        int coorY = 58;
 
+    while(cantidadMesas<cantidadNodos)
+    {
+        int coorY = 58;
         for(int j=0;j<5;j++){
 
             if(cantidadMesas==0&&j==0){
-                matrizUbicaciones->returnPos(j)->setValue(i,cantidadMesas);
                 arrayCoordenasX->setValue(cantidadMesas,coorXCocina);
                 arrayCoordenasY->setValue(cantidadMesas,coorYCocina);
                 coorY+=113;
             }else{
-                matrizUbicaciones->returnPos(j)->setValue(i,cantidadMesas);
                 arrayCoordenasX->setValue(cantidadMesas,coorX);
                 arrayCoordenasY->setValue(cantidadMesas,coorY);
                 QImage mesa(":/Imagenes/mesa.png");
@@ -368,121 +311,15 @@ void Controladora::agregaNodos(){
             if(cantidadMesas==cantidadNodos){
                 break;
             }
+            delay();
         }
         coorX+=113;
-        i++;
     }
 
-}
-
-int Controladora::buscaNodo(int nodo,bool llave){
-    bool bandera=true;
-    int i=0;
-    while(i<filasMatriz && bandera){
-        int j=0;
-        while(j<columnasMatriz && bandera){
-            if(nodo==matrizUbicaciones->returnPos(i)->returnPos(j)){
-                if(llave) return j; else  return i;
-            }
-            j++;
-        }
-        i++;
+    for(int i = 0;i<cantidadNodos;i++){
+        cout<<"x"<<arrayCoordenasX->returnPos(i)<<" ";
+        cout<<"y"<<arrayCoordenasY->returnPos(i)<<" ";
     }
-    return 0;
-}
-
-void Controladora::controlDibujo(ArrayList<int> nodosInicio, ArrayList<int> nodosDestino){
-        srand(time(NULL));
-
-        for(int i=0;i<cantidadNodos;i++){
-           int nodoInicio = nodosInicio.returnPos(i);
-            int nodoDestino = nodosDestino.returnPos(i);
-            if(nodoDestino == -1 || nodoInicio == -1){
-                break;
-            }
-
-            int r = rand() % (255);
-            int g = rand() % (255);
-            int b = rand() % (255);
-
-            QColor color(r,g,b);
-            pen->setColor(color);
-
-            dibujaLinea(nodoInicio,nodoDestino);
-            delay();
-
-        }
-}
-
-void Controladora::controlDibujo(ArrayList<int> nodos){
-    srand(time(NULL));
-
-    for(int i=cantidadNodos-1;i>0;i--){
-       int nodoInicio = nodos.returnPos(i);
-        int nodoDestino = nodos.returnPos(i-1);
-        if(nodoDestino != -1 && nodoInicio != -1){
-            cout<<"entra"<<nodoInicio<<" "<<nodoDestino<<endl;
-            int r = rand() % (255);
-            int g = rand() % (255);
-            int b = rand() % (255);
-
-            QColor color(r,g,b);
-            pen->setColor(color);
-
-            dibujaLinea(nodoInicio,nodoDestino);
-            delay();
-        }
-    }
-}
-
-void Controladora::dibujaLinea(int nodoInicio,int nodoDestino){
-
-    int coorXDestino=arrayCoordenasX->returnPos(nodoInicio)+28.5;
-    int coorYDestino=arrayCoordenasY->returnPos(nodoInicio)+80.5;
-    int coorXInicio;
-    int coorYInicio;
-
-    line = scene->addLine(arrayCoordenasX->returnPos(nodoInicio)+28.5,arrayCoordenasY->returnPos(nodoInicio)+60.5,
-                          coorXInicio =coorXDestino,coorYInicio = coorYDestino,*pen);
-
-    int filaNodoInicio =buscaNodo(nodoInicio,false);
-    int filaNodoDestino =buscaNodo(nodoDestino,false);
-    int columnaNodoInicio =buscaNodo(nodoInicio,true);
-    int columnaNodoDestino =buscaNodo(nodoDestino,true);
-    int distanciaColumnas=columnaNodoInicio-columnaNodoDestino;
-
-    distanciaColumnas = abs(distanciaColumnas);
-
-
-    if(filaNodoInicio != filaNodoDestino || (nodoDestino==0 || nodoInicio == 0) ){
-    distanciaColumnas=56.5;
-
-    }else  distanciaColumnas=56.5*(distanciaColumnas+1);
-
-
-    coorXDestino=coorXInicio;
-    coorYDestino=coorYInicio;
-
-    line = scene->addLine(coorXInicio,coorYInicio,
-                          coorXDestino=coorXDestino+distanciaColumnas,coorYDestino,*pen);
-
-    coorXInicio=coorXDestino;
-
-    if(filaNodoInicio != filaNodoDestino || nodoDestino==0 || nodoInicio == 0){
-
-            line = scene->addLine(coorXInicio,coorYInicio,
-                                  coorXDestino,
-                                  coorYDestino=arrayCoordenasY->returnPos(nodoDestino)+80.5,*pen);
-            coorYInicio=coorYDestino;
-        coorXInicio=coorXDestino;
-        coorXDestino=arrayCoordenasX->returnPos(nodoDestino);
-
-        line = scene->addLine(coorXInicio,coorYInicio,
-                              coorXDestino=coorXDestino+28.5,coorYDestino,*pen);
-        coorXInicio=coorXDestino;
-}
-        line = scene->addLine(coorXInicio,coorYInicio,
-                              coorXDestino ,arrayCoordenasY->returnPos(nodoDestino)+60.5,*pen);
 }
 
 void Controladora::retroceder(){

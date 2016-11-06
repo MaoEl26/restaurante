@@ -20,8 +20,7 @@ SOURCES += main.cpp\
     kruskal.cpp \
     matriz.cpp \
     prim.cpp \
-    boton.cpp \
-    warshall.cpp
+    boton.cpp
 
 HEADERS  += \
     arraylist.h \
@@ -31,8 +30,7 @@ HEADERS  += \
     kruskal.h \
     matriz.h \
     prim.h \
-    boton.h \
-    warshall.h
+    boton.h
 
 FORMS    +=
 

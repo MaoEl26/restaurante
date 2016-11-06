@@ -2,6 +2,7 @@
 #define infinito -1
 #define vacio -300
 
+
 Prim::Prim(int nodos, Matriz<ArrayList<int> *, int> *matrizPesos)
 {
    //Inicializa los arreglos y matrices
@@ -15,6 +16,8 @@ Prim::Prim(int nodos, Matriz<ArrayList<int> *, int> *matrizPesos)
     cantidadNodosVisitados=1; //ira aumentando de acuerdo a los nodos q ya se visitaron
     cantidadNodos();
 }
+
+
 
 void Prim::cantidadNodos(){
 
