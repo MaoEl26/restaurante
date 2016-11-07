@@ -215,18 +215,22 @@ void Controladora::guardaNodoInicioDijkstra(){
 }
 
 void Controladora::guardaNodoDestinoDijkstra(){
+
     nodoDestinoSeleccionado = menuDestinoDijkstra->currentIndex();
 
     if(nodoDestinoSeleccionado != nulo){
+
         nombreArchivo= dijkstraRadio->text();
 
         nodoDestinoSeleccionado--;
 
-        dijkstra = new Dijkstra(cantidadNodos,nodoInicioSeleccionado,nodoDestinoSeleccionado,matrizAdyacencia);
+        Dijkstra *dijkstra = new Dijkstra
+                (cantidadNodos,nodoInicioSeleccionado,nodoDestinoSeleccionado,matrizAdyacencia);
 
         ArrayList<int> ruta = dijkstra->getRutaNodo();
 
         algoritmoDocumentos(ruta);
+
         dibujaGrafo();
 
         controlDibujo(ruta);
@@ -235,17 +239,23 @@ void Controladora::guardaNodoDestinoDijkstra(){
 
 void Controladora::checkSeleccion(){
     if(dijkstraRadio->isChecked()){
+
         menuInicioDijkstra->setEnabled(true);
+
     }else{
+
         menuInicioDijkstra->setEnabled(false);
+
         menuDestinoDijkstra->setEnabled(false);
     }
     if(floydRadio->isChecked()){
 
         nombreArchivo= floydRadio->text();
 
-        floyd = new Floyd(cantidadNodos,matrizAdyacencia);
+        Floyd *floyd = new Floyd(cantidadNodos,matrizAdyacencia);
+
         Matriz<ArrayList<int>*,int> matrizFloyd = floyd->algoritmoFloyd();
+
         Matriz<ArrayList<int>*,int> matrizRutas = floyd->getMatrizRutas();
 
         algoritmoDocumentos(matrizFloyd,matrizRutas);
@@ -257,23 +267,43 @@ void Controladora::checkSeleccion(){
         nombreArchivo= primRadio->text();
 
         Prim *alPrim = new Prim(cantidadNodos,matrizAdyacencia);
+
         ArrayList<int> nodosInicio = alPrim->getRutaInicial();
+
         ArrayList<int> nodosDestino =alPrim->getRutaDestino();
+
         algoritmoDocumentos(nodosInicio,nodosDestino);
+
         dibujaGrafo();
+
         controlDibujo(nodosInicio,nodosDestino);
     }
     if (kruskalRadio->isChecked()){
 
         nombreArchivo= kruskalRadio->text();
+
+        Kruskal *kruskal = new Kruskal(matrizAdyacencia,cantidadNodos);
+
+        ArrayList<int> nodosInicio = kruskal->getRutaInicial();
+
+        ArrayList<int> nodosDestino =kruskal->getRutaDestino();
+
+        algoritmoDocumentos(nodosInicio,nodosDestino);
+
         dibujaGrafo();
+
+        controlDibujo(nodosInicio,nodosDestino);
     }
     if(warshallRadio->isChecked()){
 
         nombreArchivo= warshallRadio->text();
+
         Warshall *warshall = new Warshall(cantidadNodos,matrizAdyacencia);
+
         Matriz<ArrayList<int>*,int> matrizWarshall = warshall->getMatriz();
+
         algoritmoDocumentos(matrizWarshall);
+
         dibujaGrafo();
     }
 }
@@ -657,18 +687,23 @@ void Controladora::algoritmoDocumentos(ArrayList<int> nodosInicio, ArrayList<int
     for(int i = 0;i<cantidadNodos;i++){
         int nodoInicio = nodosInicio.returnPos(i);
         int nodoDestino = nodosDestino.returnPos(i);
+
         if(nodoInicio==nulo){
             archivo+=" Cocina ";
-        }
-        if (nodoDestino==nulo){
-            archivo+=" Cocina ";
-        }
-        if (nodoInicio!=-1 ){
+
+        }else if (nodoInicio!=-1 ){
+
             archivo+=" Mesa "+QString::number(nodoInicio);
         }
-        if (nodoDestino!=-1 ){
+        if (nodoDestino==nulo){
+
+            archivo+=" Cocina ";
+
+        }if (nodoDestino!=-1 ){
+
             archivo+=" Mesa "+QString::number(nodoDestino);
         }
+        archivo+="\r\n";
     }
     archivo+="\r\n";
 

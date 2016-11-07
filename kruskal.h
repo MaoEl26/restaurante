@@ -13,12 +13,20 @@ class Kruskal
         Kruskal(Matriz<ArrayList<int> *, int>* matriz, int cantidadNodos);
         virtual ~Kruskal();
 
+        Matriz<ArrayList<int> *, int> algoritmoKruskal();
+
+        ArrayList<int> getPesoRuta();
+        ArrayList<int> getRutaInicial();
+        ArrayList<int> getRutaDestino();
+
     protected:
-        Matriz<ArrayList<int>*,int>* algoritmoKruskal();
 
         int nodos;
         Matriz<ArrayList<int>*,int> *matrizKruskalInicial;
         Matriz<ArrayList<int>*,int> *matrizKruskalResultado;
+        ArrayList<int> *pesoRuta;
+        ArrayList<int> *nodosInicio;
+        ArrayList<int> *nodosDestino;
         ArrayList<int> *nodosUsados;
 
     private:

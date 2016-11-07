@@ -113,10 +113,6 @@ public:
 
     QTextEdit *areaTexto;
 
-    Floyd *floyd;
-    Dijkstra *dijkstra;
-
-
 public slots:
         /// aqui va la respuesta de los boton
         void startMenu();
