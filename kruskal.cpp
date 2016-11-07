@@ -3,8 +3,17 @@
 #define infinito 999999999  
 
 Kruskal::Kruskal(Matriz<ArrayList<int>*,int>* matriz, int cantidadNodos){
-    matrizKruskalInicial = matriz;
+
+    matrizKruskalInicial = new Matriz< ArrayList<int>*,int>(cantidadNodos);
+
     this->nodos=cantidadNodos;
+
+    for(int i =0; i<nodos;i++){
+        for(int j=0;j<nodos;j++){
+            matrizKruskalInicial->insert(i,j,matriz->returnPos(i)->returnPos(j));
+        }
+    }
+
     matrizKruskalResultado = new Matriz< ArrayList<int>*,int>(nodos);
     nodosUsados = new ArrayList<int>(nodos);
     nodosInicio = new ArrayList<int>(nodos);
@@ -44,10 +53,12 @@ Matriz<ArrayList<int>*,int> Kruskal::algoritmoKruskal(){
             pesoRuta->setValue(conexiones-1,min);
             nodosInicio->setValue(conexiones-1,nodoTempA);
             nodosDestino->setValue(conexiones-1,nodoTempB);
+
             matrizKruskalResultado->returnPos(nodoTempA)->setValue(nodoTempB,min);
             matrizKruskalResultado->returnPos(nodoTempB)->setValue(nodoTempA,min);
 
             int valorTemporal = nodosUsados->returnPos(nodoTempB);
+
             nodosUsados->setValue(nodoTempB,nodosUsados->returnPos(nodoTempA));
             for(int k=0; k<nodos;k++){
                 if (nodosUsados->returnPos(k)== valorTemporal){

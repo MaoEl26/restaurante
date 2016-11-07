@@ -3,9 +3,16 @@
 #define infinito -1
 #define vacio -300
 
-Dijkstra::Dijkstra(int nodos, int nodoBusqueda,int nodoDestino, Matriz<ArrayList<int> *, int> *matrizPesos)
+Dijkstra::Dijkstra(int nodos, int nodoBusqueda,int nodoDestino, Matriz<ArrayList<int> *, int> *matrizPeso)
 {
-    this->matrizPesos= matrizPesos; //Matriz de pesos original
+    matrizPesos= new Matriz< ArrayList<int>*,int>(nodos); //Matriz de pesos original
+
+    for(int i =0; i<nodos;i++){
+        for(int j=0;j<nodos;j++){
+            matrizPesos->insert(i,j,matrizPeso->returnPos(i)->returnPos(j));
+        }
+    }
+
     this->nodos= nodos; //Cantidad de nodos
     this->nodoBusqueda = nodoBusqueda; //Nodo inicial con el cual se va realizar la matriz de dijsktra
     this->nodoDestino= nodoDestino;

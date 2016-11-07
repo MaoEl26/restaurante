@@ -2,10 +2,17 @@
 #define infinito -1
 #define vacio -300
 
-Prim::Prim(int nodos, Matriz<ArrayList<int> *, int> *matrizPesos)
+Prim::Prim(int nodos, Matriz<ArrayList<int> *, int> *matriz)
 {
    //Inicializa los arreglos y matrices
-    this->matrizPesos= matrizPesos;  //Matriz de pesos de grafo original
+    matrizPesos= new Matriz<ArrayList<int>*,int>(nodos);  //Matriz de pesos de grafo original
+
+    for(int i =0; i<nodos;i++){
+        for(int j=0;j<nodos;j++){
+            matrizPesos->insert(i,j,matriz->returnPos(i)->returnPos(j));
+        }
+    }
+
     this->nodos= nodos;   //Cantidad de nodos totales
     matrizValoresUsados = new Matriz< ArrayList<bool>*,bool>(nodos); //Marcara en true las aristas por las cuales ya
                                                                         // se recorrio

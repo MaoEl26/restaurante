@@ -13,6 +13,7 @@ Controladora::Controladora()
     agregarBotonesJugar();
     show();
 }
+
 void delay(){
     QTime dieTime= QTime::currentTime().addSecs(4);
     while (QTime::currentTime() < dieTime)
@@ -42,6 +43,7 @@ void Controladora::agregarBotonesJugar(){
     connect(inicioBoton, SIGNAL(clicked()), this, SLOT(startMenu()));
     scene->addItem(inicioBoton);
 
+    //Agrega y da funcion al boton salir
     salirBoton = new Boton(":/Imagenes/B_SALIR.png");
     salirBoton->setPos(1040,310);
     salirBoton->setScale(1.3);
@@ -53,12 +55,16 @@ void Controladora::getDireccionArchivo(){
 
     cantidadNodos = nulo;
 
+    //Guarda el path del archivo a utilizar
     filename=QFileDialog::getOpenFileName(this,"Open File","C://","Text File(*.txt)");
 
+    //Crea una variable con los datos del documento
     QFile documento(filename);
     if(!documento.open(QIODevice::ReadOnly)){
+        //Mensaje de error cuando no se puede acceder al documento
         QMessageBox::information(this,"Informacion",documento.errorString());
     }else{
+        //Almacena
        while(!documento.atEnd()){
 
            documento.readLine();
@@ -91,13 +97,6 @@ void Controladora::getDireccionArchivo(){
        QStringList url = filename.split("/");
        QString user =url[2];
        path = "C:/Users/"+user+"/Desktop/";
-
-       for(int i=0;i<cantidadNodos;i++){
-           for(int j=0;j<cantidadNodos;j++){
-               cout<<matrizAdyacencia->returnPos(i)->returnPos(j)<<" ";
-           }
-           cout<<endl;
-       }
 
        menuSeleccionFunciones();
        }
@@ -134,7 +133,6 @@ void Controladora::menuSeleccionFunciones(){
     //Establece los estilos y lo muestra en pantalla
     dijkstraRadio->setFont(*letrasRadio);
     dijkstraRadio->setPalette(*estiloRadio);
-
     dijkstraRadio->show();
     connect(dijkstraRadio,SIGNAL(clicked(bool)),this,SLOT(checkSeleccion()));
 
@@ -174,31 +172,52 @@ void Controladora::menuSeleccionFunciones(){
     warshallRadio->show();
     connect(warshallRadio,SIGNAL(clicked(bool)),this,SLOT(checkSeleccion()));
 
-    //Menu de nodos a seleccionar Dijkstra
+    //Menu de nodos a seleccionar Dijkstra y FLoyd
     menuInicioDijkstra = new QComboBox(this);
-    menuInicioDijkstra->setGeometry(700,240,75,25);
+    menuInicioDijkstra->setGeometry(625,260,75,25);
     menuInicioDijkstra->setEnabled(false);
-    menuInicioDijkstra->addItem("");//0
+    menuInicioDijkstra->addItem("Inicio");//0
 
     menuDestinoDijkstra = new QComboBox(this);
-    menuDestinoDijkstra->setGeometry(700,270,75,25);
+    menuDestinoDijkstra->setGeometry(710,260,75,25);
     menuDestinoDijkstra->setEnabled(false);
-    menuDestinoDijkstra->addItem("");//0
+    menuDestinoDijkstra->addItem("Destino");//0
 
+    menuInicioFloyd = new QComboBox(this);
+    menuInicioFloyd->setGeometry(625,310,75,25);
+    menuInicioFloyd->setEnabled(false);
+    menuInicioFloyd->addItem("Inicio");//0
+
+    menuDestinoFloyd = new QComboBox(this);
+    menuDestinoFloyd->setGeometry(710,310,75,25);
+    menuDestinoFloyd->setEnabled(false);
+    menuDestinoFloyd->addItem("Destino");//0
+
+    //Inserta los elementos en base a la cantidad de nodos
     for(int i =0;i<cantidadNodos;i++){
         if(i==nulo){
             menuDestinoDijkstra->addItem("Cocina");
             menuInicioDijkstra->addItem("Cocina");
+            menuDestinoFloyd->addItem("Cocina");
+            menuInicioFloyd->addItem("Cocina");
         }else{
             menuInicioDijkstra->addItem("Mesa "+QString::number(i));
             menuDestinoDijkstra->addItem("Mesa "+QString::number(i));
+            menuInicioFloyd->addItem("Mesa "+QString::number(i));
+            menuDestinoFloyd->addItem("Mesa "+QString::number(i));
         }
     }
+    //Muestra los combo box en pantalla
     menuInicioDijkstra->show();
     menuDestinoDijkstra->show();
+    menuInicioFloyd->show();
+    menuDestinoFloyd->show();
 
+    //Le agrega la función
     connect(menuInicioDijkstra,SIGNAL(activated(QString)),this,SLOT(guardaNodoInicioDijkstra()));
     connect(menuDestinoDijkstra,SIGNAL(activated(QString)),this,SLOT(guardaNodoDestinoDijkstra()));
+    connect(menuInicioFloyd,SIGNAL(activated(QString)),this,SLOT(guardaNodoInicioFloyd()));
+    connect(menuDestinoFloyd,SIGNAL(activated(QString)),this,SLOT(guardaNodoDestinoFloyd()));
 
 }
 
@@ -237,7 +256,48 @@ void Controladora::guardaNodoDestinoDijkstra(){
     }
 }
 
+void Controladora::guardaNodoInicioFloyd(){
+
+    nodoInicioSeleccionado = menuInicioFloyd->currentIndex();
+
+    if(nodoInicioSeleccionado != nulo){
+
+        nodoInicioSeleccionado--;
+
+        menuDestinoFloyd->setEnabled(true);
+    }
+}
+
+void Controladora::guardaNodoDestinoFloyd(){
+
+    nodoDestinoSeleccionado = menuDestinoFloyd->currentIndex();
+
+    if(nodoDestinoSeleccionado != nulo){
+
+        nombreArchivo= floydRadio->text();
+
+        nodoDestinoSeleccionado--;
+
+        nombreArchivo= floydRadio->text();
+
+        Floyd *floyd = new Floyd(cantidadNodos,nodoInicioSeleccionado,nodoDestinoSeleccionado,matrizAdyacencia);
+
+        Matriz<ArrayList<int>*,int> matrizFloyd = floyd->getMatrizPesos();
+
+        Matriz<ArrayList<int>*,int> matrizRutas = floyd->getMatrizRutas();
+
+        ArrayList<int> ruta = floyd->getRuta();
+
+        algoritmoDocumentos(matrizFloyd,matrizRutas,ruta);
+
+        dibujaGrafo();
+
+        controlDibujo(ruta);
+    }
+}
+
 void Controladora::checkSeleccion(){
+
     if(dijkstraRadio->isChecked()){
 
         menuInicioDijkstra->setEnabled(true);
@@ -248,20 +308,18 @@ void Controladora::checkSeleccion(){
 
         menuDestinoDijkstra->setEnabled(false);
     }
+
     if(floydRadio->isChecked()){
 
-        nombreArchivo= floydRadio->text();
+        menuInicioFloyd->setEnabled(true);
 
-        Floyd *floyd = new Floyd(cantidadNodos,matrizAdyacencia);
+    }else{
 
-        Matriz<ArrayList<int>*,int> matrizFloyd = floyd->algoritmoFloyd();
+        menuInicioFloyd->setEnabled(false);
 
-        Matriz<ArrayList<int>*,int> matrizRutas = floyd->getMatrizRutas();
-
-        algoritmoDocumentos(matrizFloyd,matrizRutas);
-
-        dibujaGrafo();
+        menuDestinoFloyd->setEnabled(false);
     }
+
     if(primRadio->isChecked()){
 
         nombreArchivo= primRadio->text();
@@ -278,6 +336,7 @@ void Controladora::checkSeleccion(){
 
         controlDibujo(nodosInicio,nodosDestino);
     }
+
     if (kruskalRadio->isChecked()){
 
         nombreArchivo= kruskalRadio->text();
@@ -294,6 +353,7 @@ void Controladora::checkSeleccion(){
 
         controlDibujo(nodosInicio,nodosDestino);
     }
+
     if(warshallRadio->isChecked()){
 
         nombreArchivo= warshallRadio->text();
@@ -317,6 +377,8 @@ void Controladora::deleteEtiquetas(){
     warshallRadio->setVisible(false);
     menuInicioDijkstra->setVisible(false);
     menuDestinoDijkstra->setVisible(false);
+    menuInicioFloyd->setVisible(false);
+    menuDestinoFloyd->setVisible(false);
 
     dijkstraRadio->deleteLater();
     floydRadio->deleteLater();
@@ -325,6 +387,8 @@ void Controladora::deleteEtiquetas(){
     warshallRadio->deleteLater();
     menuInicioDijkstra->deleteLater();
     menuDestinoDijkstra->deleteLater();
+    menuInicioFloyd->deleteLater();
+    menuDestinoFloyd->deleteLater();
 }
 
 void Controladora::dibujaGrafo(){
@@ -332,7 +396,7 @@ void Controladora::dibujaGrafo(){
 
     pen = new QPen ();
 
-    pen->setWidth(6);
+    pen->setWidth(10);
 
     deleteEtiquetas();
 
@@ -361,6 +425,7 @@ void Controladora::dibujaGrafo(){
     matrizUbicaciones = new Matriz<ArrayList<int>*,int>(filasMatriz,columnasMatriz);
     arrayCoordenasX = new ArrayList<int>(50);
     arrayCoordenasY = new ArrayList<int>(50);
+
     agregaNodos();
 }
 
@@ -413,6 +478,23 @@ void Controladora::agregaNodos(){
         i++;
     }
 
+    for(int i=0;i<cantidadNodos;i++){
+        for(int j=0;j<cantidadNodos;j++){
+            int valor = matrizAdyacencia->returnPos(i)->returnPos(j);
+
+            if (valor!=-1&& valor!=0 ){
+
+                int r = (rand() % 178)+20;
+                int g = (rand() % 178)+22;
+                int b = (rand() % 178)+21;
+                QColor color(r,g,b);
+                pen->setColor(color);
+                dibujaLinea(i,j);
+                delay();
+            }
+        }
+    }
+    pen->setWidth(4);
 }
 
 int Controladora::buscaNodo(int nodo,bool llave){
@@ -449,6 +531,7 @@ void Controladora::controlDibujo(ArrayList<int> nodosInicio, ArrayList<int> nodo
             pen->setColor(color);
 
             dibujaLinea(nodoInicio,nodoDestino);
+
             delay();
 
         }
@@ -463,14 +546,15 @@ void Controladora::controlDibujo(ArrayList<int> nodos){
         int nodoDestino = nodos.returnPos(i+1);
 
         if(nodoDestino != -1 && nodoInicio != -1 ){
-            int r = rand() % (255);
-            int g = rand() % (255);
-            int b = rand() % (255);
+            int r = rand() % 255 + 96;
+            int g = rand() % 255 + 117;
+            int b = rand() % 255 + 113;
 
             QColor color(r,g,b);
             pen->setColor(color);
 
             dibujaLinea(nodoInicio,nodoDestino);
+
             delay();
         }
     }
@@ -544,7 +628,7 @@ void Controladora::exit(){
 }
 
 void Controladora::algoritmoDocumentos
-(Matriz<ArrayList<int> *, int> matrizFloyd, Matriz<ArrayList<int> *, int> matrizRutas){
+(Matriz<ArrayList<int> *, int> matrizFloyd, Matriz<ArrayList<int> *, int> matrizRutas, ArrayList<int> nodosRutas){
 
     archivo+="Matriz de Adyacencia \r\n";
     for(int i = 0;i<cantidadNodos;i++){
@@ -591,11 +675,44 @@ void Controladora::algoritmoDocumentos
         }
         archivo+="\r\n";
    }
+    archivo+="\r\n Recorrido de la ruta seleccionada \r\n";
+    for(int i = 0;i<cantidadNodos;i++){
+        int nodo = nodosRutas.returnPos(i);
+        if(nodo==nulo){
+            archivo+="Cocina";
+        }else if (nodo!=-1){
+            archivo+=" Mesa "+QString::number(nodo);
+        }
+    }
+    archivo+="\r\n";
     return;
 }
 
 void Controladora::algoritmoDocumentos(Matriz<ArrayList<int> *, int> matriz){
-    archivo+="Matriz de Adyacencia \r\n";
+
+    archivo+="Matriz de Adyacencia Entrante \r\n";
+    for(int i = 0;i<cantidadNodos;i++){
+        if(i==nulo){
+            archivo+="       Cocina";
+        }else{
+            archivo+=" Mesa "+QString::number(i);
+        }
+    }
+    archivo+="\r\n";
+
+    for(int i=0;i<cantidadNodos;i++){
+        if(i==nulo){
+            archivo+="Cocina     ";
+        }else{
+           archivo+="Mesa "+QString::number(i)+"     ";
+        }
+        for(int j=0;j<cantidadNodos;j++){
+            archivo+=QString::number(matrizAdyacencia->returnPos(i)->returnPos(j))+"     ";
+        }
+        archivo+="\r\n";
+   }
+
+    archivo+="\r\n\r\nMatriz de Adyacencia Resultante \r\n";
     for(int i = 0;i<cantidadNodos;i++){
         if(i==nulo){
             archivo+="       Cocina";
@@ -699,7 +816,7 @@ void Controladora::algoritmoDocumentos(ArrayList<int> nodosInicio, ArrayList<int
 
             archivo+=" Cocina ";
 
-        }if (nodoDestino!=-1 ){
+        }else if (nodoDestino!=-1 ){
 
             archivo+=" Mesa "+QString::number(nodoDestino);
         }

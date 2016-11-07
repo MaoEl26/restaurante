@@ -9,7 +9,7 @@ using namespace std;
 class Prim
 {
     public:
-        Prim(int nodos, Matriz<ArrayList<int> *, int> *matrizPesos);
+        Prim(int nodos, Matriz<ArrayList<int> *, int> *matriz);
         virtual ~Prim();
         void cantidadNodos();
         void algoritmo();

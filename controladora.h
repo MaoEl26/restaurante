@@ -69,20 +69,24 @@ public:
     void ambiente();
     void agregarBotonesJugar();
     void getDireccionArchivo();
+
     void menuSeleccionFunciones();
+    void deleteEtiquetas();
+
     void dibujaGrafo();
     void agregaNodos();
+
     void creaDocumento();
     void dibujaLinea(int nodoInicio,int nodoDestino);
-    void deleteEtiquetas();
+
     void controlDibujo(ArrayList<int> nodosInicio, ArrayList<int> nodosDestino);
     void controlDibujo(ArrayList<int> nodos);
-    //delay();
 
     int buscaNodo(int nodo,bool llave);
 
     //Creacion de Documento de los algoritmos
-    void algoritmoDocumentos(Matriz<ArrayList<int> *, int> matrizFloyd, Matriz<ArrayList<int> *, int> matrizRutas);
+    void algoritmoDocumentos(Matriz<ArrayList<int> *, int> matrizFloyd,
+                             Matriz<ArrayList<int> *, int> matrizRutas, ArrayList<int> nodosRutas);
     void algoritmoDocumentos(ArrayList<int> nodosRutas);
     void algoritmoDocumentos(ArrayList<int> nodosInicio,ArrayList<int> nodosDestino);
     void algoritmoDocumentos(Matriz<ArrayList<int> *, int> matriz);
@@ -111,6 +115,10 @@ public:
     QComboBox *menuInicioDijkstra;
     QComboBox *menuDestinoDijkstra;
 
+    QComboBox *menuInicioFloyd;
+    QComboBox *menuDestinoFloyd;
+
+
     QTextEdit *areaTexto;
 
 public slots:
@@ -118,10 +126,16 @@ public slots:
         void startMenu();
         void exit();
         void checkSeleccion();
+
         void guardaNodoInicioDijkstra();
         void guardaNodoDestinoDijkstra();
+
+        void guardaNodoInicioFloyd();
+        void guardaNodoDestinoFloyd();
+
         void retroceder();
         void retrocederMenuPrincipal();
+
         void generadorDocumento();
 
 };

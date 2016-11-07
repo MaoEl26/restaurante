@@ -1,16 +1,31 @@
 #include "Floyd.h"
 #define infinito -1
 
-Floyd::Floyd(int nodos, Matriz<ArrayList<int> *, int> *matrizPesos){
+Floyd::Floyd(int nodos, int nodoInicio, int nodoDestino, Matriz<ArrayList<int> *, int> *matrizPesos){
+
     this->nodos=nodos;
-    matrizDn = matrizPesos;
+    this->nodoInicio=nodoInicio;
+    this->nodoDestino=nodoDestino;
+
+    matrizDn = new Matriz<ArrayList<int>*,int>(nodos);
+
+    for(int i =0; i<nodos;i++){
+        for(int j=0;j<nodos;j++){
+            matrizDn->insert(i,j,matrizPesos->returnPos(i)->returnPos(j));
+        }
+    }
+
     matrizRutas = new Matriz<ArrayList<int>*,int>(nodos);
+    ruta= new ArrayList<int>(nodos);
+    ruta->allEqual(-1);
+
     for(int i=0;i<nodos;i++){
         matrizRutas->returnPos(i)->allEqual(0);
     }
+    algoritmoFloyd();
 }
 
-Matriz<ArrayList<int> *, int> Floyd::algoritmoFloyd(){
+void Floyd::algoritmoFloyd(){
     int valorActual;
     int valorFila;
     int valorColumna;
@@ -41,12 +56,35 @@ Matriz<ArrayList<int> *, int> Floyd::algoritmoFloyd(){
             }
         }
      }
+}
 
-     return *matrizDn;
+Matriz<ArrayList<int> *, int> Floyd::getMatrizPesos(){
+    return *matrizDn;
 }
 
 Matriz<ArrayList<int> *, int> Floyd::getMatrizRutas(){
     return *matrizRutas;
+}
+
+ArrayList<int> Floyd::getRuta(){
+    ruta->goToPos(0);
+    ruta->insert(nodoInicio);
+    ruta->goToPos(1);
+    ruta->insert(nodoDestino);
+    bool bandera=false;
+    int pos=1;
+    while(!bandera){
+        int valor=matrizRutas->returnPos(nodoInicio)->returnPos(nodoDestino);
+        if (valor==0){
+            bandera=true;
+        }else{
+            nodoInicio=valor-1;
+            ruta->goToPos(pos);
+            ruta->insert(nodoInicio);
+            pos++;
+        }
+    }
+    return *ruta;
 }
 
 Floyd::~Floyd()

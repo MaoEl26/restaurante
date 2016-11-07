@@ -5,7 +5,15 @@
 Warshall::Warshall(int nodos, Matriz<ArrayList<int> *, int> *matriz)
 {
     this->nodos= nodos;
-    matrizAdyacencia = matriz;
+
+    matrizAdyacencia = new Matriz<ArrayList<int> *, int>(nodos);
+
+    for(int i =0; i<nodos;i++){
+        for(int j=0;j<nodos;j++){
+            matrizAdyacencia->insert(i,j,matriz->returnPos(i)->returnPos(j));
+        }
+    }
+
     convertirMatriz();
     algoritmo();
 }
@@ -16,7 +24,7 @@ void Warshall::convertirMatriz(){
     for(int i= cero; i<nodos; i++){
         for(int j= cero ; j<nodos; j++){
             numero = matrizAdyacencia->returnPos(i)->returnPos(j);
-            if(numero!= infinito && j != i){
+            if(numero!= infinito && j != i && numero!=cero){
                 matrizAdyacencia->returnPos(i)->setValue(j,uno);
             }
             else{
