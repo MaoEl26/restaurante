@@ -1,11 +1,11 @@
 #include "Floyd.h"
 #define infinito -1
+#define nulo 0
 
-Floyd::Floyd(int nodos, int nodoInicio, int nodoDestino, Matriz<ArrayList<int> *, int> *matrizPesos){
+Floyd::Floyd(int nodos, Matriz<ArrayList<int> *, int> *matrizPesos,QString archivo){
 
     this->nodos=nodos;
-    this->nodoInicio=nodoInicio;
-    this->nodoDestino=nodoDestino;
+    this->archivo=archivo;
 
     matrizDn = new Matriz<ArrayList<int>*,int>(nodos);
 
@@ -17,7 +17,7 @@ Floyd::Floyd(int nodos, int nodoInicio, int nodoDestino, Matriz<ArrayList<int> *
 
     matrizRutas = new Matriz<ArrayList<int>*,int>(nodos);
     ruta= new ArrayList<int>(nodos);
-    ruta->allEqual(-1);
+    //ruta->allEqual(infinito);
 
     for(int i=0;i<nodos;i++){
         matrizRutas->returnPos(i)->allEqual(0);
@@ -29,6 +29,30 @@ void Floyd::algoritmoFloyd(){
     int valorActual;
     int valorFila;
     int valorColumna;
+
+    archivo+="Matriz de Adyacencia D("+QString::number(0)+")\r\n";
+    for(int i = 0;i<nodos;i++){
+        if(i==nulo){
+            archivo+="       Cocina";
+        }else{
+            archivo+=" Mesa "+QString::number(i);
+        }
+    }
+    archivo+="\r\n";
+
+    for(int i=0;i<nodos;i++){
+        if(i==nulo){
+            archivo+="Cocina     ";
+        }else{
+           archivo+="Mesa "+QString::number(i)+"     ";
+        }
+        for(int j=0;j<nodos;j++){
+            archivo+=QString::number(matrizDn->returnPos(i)->returnPos(j))+"     ";
+        }
+        archivo+="\r\n";
+   }
+    archivo+="\r\n";
+
      for(int k = 0; k < nodos; k++){
         for(int i = 0; i < nodos; i++){
           for(int j = 0; j < nodos; j++){
@@ -55,6 +79,28 @@ void Floyd::algoritmoFloyd(){
                 }
             }
         }
+        archivo+="Matriz de Adyacencia D("+QString::number(k+1)+")\r\n";
+        for(int i = 0;i<nodos;i++){
+            if(i==nulo){
+                archivo+="       Cocina";
+            }else{
+                archivo+=" Mesa "+QString::number(i);
+            }
+        }
+        archivo+="\r\n";
+
+        for(int i=0;i<nodos;i++){
+            if(i==nulo){
+                archivo+="Cocina     ";
+            }else{
+               archivo+="Mesa "+QString::number(i)+"     ";
+            }
+            for(int j=0;j<nodos;j++){
+                archivo+=QString::number(matrizDn->returnPos(i)->returnPos(j))+"     ";
+            }
+            archivo+="\r\n";
+       }
+        archivo+="\r\n";
      }
 }
 
@@ -66,7 +112,9 @@ Matriz<ArrayList<int> *, int> Floyd::getMatrizRutas(){
     return *matrizRutas;
 }
 
-ArrayList<int> Floyd::getRuta(){
+ArrayList<int> Floyd::getRuta(int nodoInicio, int nodoDestino){
+    ruta->clear();
+    ruta->allEqual(-1);
     ruta->goToPos(0);
     ruta->insert(nodoInicio);
     ruta->goToPos(1);
@@ -84,7 +132,12 @@ ArrayList<int> Floyd::getRuta(){
             pos++;
         }
     }
+
     return *ruta;
+}
+
+QString Floyd::getArchivo(){
+    return archivo;
 }
 
 Floyd::~Floyd()

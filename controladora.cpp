@@ -5,6 +5,7 @@
 #define nulo 0
 #define filasMatriz 5
 #define columnasMatriz 10
+#define infinito -1
 
 
 Controladora::Controladora()
@@ -15,7 +16,8 @@ Controladora::Controladora()
 }
 
 void delay(){
-    QTime dieTime= QTime::currentTime().addSecs(4);
+    //Realiza un retraso entre un dibujo y otro
+    QTime dieTime= QTime::currentTime().addSecs(3);
     while (QTime::currentTime() < dieTime)
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 }
@@ -64,7 +66,7 @@ void Controladora::getDireccionArchivo(){
         //Mensaje de error cuando no se puede acceder al documento
         QMessageBox::information(this,"Informacion",documento.errorString());
     }else{
-        //Almacena
+        //Busca la cantidad de limeas que tiene el documento
        while(!documento.atEnd()){
 
            documento.readLine();
@@ -73,31 +75,42 @@ void Controladora::getDireccionArchivo(){
        }
        documento.close();
 
+      //Inicializa la matriz de adyacencia
        matrizAdyacencia = new Matriz<ArrayList<int>*,int>(cantidadNodos);
 
+       //Reabre el documento
        QFile documento(filename);
        documento.open(QIODevice::ReadOnly);
 
+       //Lee el documento linea por linea y almacena el valor en la matriz de adyacencia
        while(!documento.atEnd()){
            for(int i=0; i<cantidadNodos;i++){
+               //Lee y almacena la linea
                QString linea = documento.readLine();
+               //Separa la linea segun el simbolo que separa las columnas
                QStringList lineaSeparada = linea.split(",");
 
                for(int j=0;j<cantidadNodos;j++){
+                   //Almacena en un string la pos j de la linea separa
                    QString valorConCambioLinea =lineaSeparada[j];
+                   //Elinima del string el valor de retorno de carro y cambio de linea
                    QString valorFinal = valorConCambioLinea.split("\r\n",QString::SkipEmptyParts)[0];
-
+                   //Almacena el valor en la matriz
                    matrizAdyacencia->insert(i,j,valorFinal.toInt());
                }
            }
        }
-
+        //Cierra el documento
        documento.close();
 
+       //Guarga la direccion del path separada por el caracter /
        QStringList url = filename.split("/");
+       //Extrae la pos 2 del arreglo, la cual sería el nombre de usuario
        QString user =url[2];
+       //Concatena todos los valores y los almacena en un string
        path = "C:/Users/"+user+"/Desktop/";
 
+       //Llama a la funcion en la cual se encuentra los RadioButton y ComboBox
        menuSeleccionFunciones();
        }
 }
@@ -172,22 +185,25 @@ void Controladora::menuSeleccionFunciones(){
     warshallRadio->show();
     connect(warshallRadio,SIGNAL(clicked(bool)),this,SLOT(checkSeleccion()));
 
-    //Menu de nodos a seleccionar Dijkstra y FLoyd
+    //Combo Box de seleccionar nodo inicial Dijkstra
     menuInicioDijkstra = new QComboBox(this);
     menuInicioDijkstra->setGeometry(625,260,75,25);
     menuInicioDijkstra->setEnabled(false);
     menuInicioDijkstra->addItem("Inicio");//0
 
+    //Combo Box de seleccionar nodo destino dijkstra
     menuDestinoDijkstra = new QComboBox(this);
     menuDestinoDijkstra->setGeometry(710,260,75,25);
     menuDestinoDijkstra->setEnabled(false);
     menuDestinoDijkstra->addItem("Destino");//0
 
+    //Combo Box para seleccionar el nodo incio para graficar recorrido Floyd
     menuInicioFloyd = new QComboBox(this);
     menuInicioFloyd->setGeometry(625,310,75,25);
     menuInicioFloyd->setEnabled(false);
     menuInicioFloyd->addItem("Inicio");//0
 
+    //Combo Box para seleccionar el nodo destino para graficar recorrido Floyd
     menuDestinoFloyd = new QComboBox(this);
     menuDestinoFloyd->setGeometry(710,310,75,25);
     menuDestinoFloyd->setEnabled(false);
@@ -222,6 +238,9 @@ void Controladora::menuSeleccionFunciones(){
 }
 
 void Controladora::guardaNodoInicioDijkstra(){
+    //Esta función almacena el valor del nodo de incio para el
+    // algorito de Dijkstra, y habilita el segundo combo box para selecionar
+    // el nodo de destino, solo activa mientras sea diferente valor inicial
 
     nodoInicioSeleccionado = menuInicioDijkstra->currentIndex();
 
@@ -230,91 +249,116 @@ void Controladora::guardaNodoInicioDijkstra(){
         nodoInicioSeleccionado--;
 
         menuDestinoDijkstra->setEnabled(true);     
+    }else{
+        menuDestinoDijkstra->setEnabled(false);
     }
 }
 
 void Controladora::guardaNodoDestinoDijkstra(){
+    //Esta funcion almacena el valor del nodo destino para el
+    // algoritmo de Dijkstra, y luego llama a las funciones
+    // necesarias para graficar y crea el documento
 
     nodoDestinoSeleccionado = menuDestinoDijkstra->currentIndex();
 
     if(nodoDestinoSeleccionado != nulo){
 
-        nombreArchivo= dijkstraRadio->text();
+        nombreArchivo= dijkstraRadio->text();//Almacena el nombre que tendra el archivo
 
-        nodoDestinoSeleccionado--;
+        nodoDestinoSeleccionado--;//Disminuye en uno el valor para coincidir con los valores
+                                  // de la matriz de adyacencia
 
+        //Inicializa el algoritmo
         Dijkstra *dijkstra = new Dijkstra
                 (cantidadNodos,nodoInicioSeleccionado,nodoDestinoSeleccionado,matrizAdyacencia);
 
-        ArrayList<int> ruta = dijkstra->getRutaNodo();
+        ArrayList<int> ruta = dijkstra->getRutaNodo();//Almacena el arreglo de las rutas
 
-        algoritmoDocumentos(ruta);
+        algoritmoDocumentos(ruta);//Crea el documento con el arreglo de las rutas para luego
+                                  // desplegarlo en pantalla
 
-        dibujaGrafo();
+        dibujaGrafo();//LLama a la funcion que dibuja el grafo
 
-        controlDibujo(ruta);
+        controlDibujo(ruta);//Realiza el dibujo del recorrido que creo el algoritmo
     }
 }
 
 void Controladora::guardaNodoInicioFloyd(){
-
+    //Esta funcion almacena el nodo de incio para graficar el
+    // algoritmo de Floyd y habilita el segundo combo box para ingresar
+    // el siguiente nodo
     nodoInicioSeleccionado = menuInicioFloyd->currentIndex();
 
     if(nodoInicioSeleccionado != nulo){
 
+        //Decrementa en uno el valor para coincidir con la matriz
+        //de adyacencia
         nodoInicioSeleccionado--;
 
         menuDestinoFloyd->setEnabled(true);
+    }else{
+        menuDestinoFloyd->setEnabled(false);
     }
 }
 
 void Controladora::guardaNodoDestinoFloyd(){
+    //Esta funcion almacena el nodo destino de Floyd para la graficación
+    // y crea las instacias necesarias para poder graficar y la creacion del documento
 
     nodoDestinoSeleccionado = menuDestinoFloyd->currentIndex();
 
     if(nodoDestinoSeleccionado != nulo){
 
-        nombreArchivo= floydRadio->text();
+        nombreArchivo= floydRadio->text();//Almacena el nombre para la creacion del
+                                          // del archivo
 
-        nodoDestinoSeleccionado--;
+        nodoDestinoSeleccionado--; //Disminuye en uno el nodo para coincidir
+                                   // con la matriz de adyacencia
 
-        nombreArchivo= floydRadio->text();
+        //Crea la instancia del algoritmo de Floyd
+        Floyd *floyd = new Floyd(cantidadNodos,matrizAdyacencia,archivo);
 
-        Floyd *floyd = new Floyd(cantidadNodos,nodoInicioSeleccionado,nodoDestinoSeleccionado,matrizAdyacencia);
-
-        Matriz<ArrayList<int>*,int> matrizFloyd = floyd->getMatrizPesos();
-
+        //Almacena la matriz de rutas para la creacion del documento
         Matriz<ArrayList<int>*,int> matrizRutas = floyd->getMatrizRutas();
 
-        ArrayList<int> ruta = floyd->getRuta();
+        //Almacena el array de la ruta en un variable para la graficación
+        ArrayList<int> ruta = floyd->getRuta(nodoInicioSeleccionado,nodoDestinoSeleccionado);
 
-        algoritmoDocumentos(matrizFloyd,matrizRutas,ruta);
+        archivo=floyd->getArchivo();
 
+        //Crea el documento y lo muestra en pantalla
+        algoritmoDocumentos(floyd,matrizRutas,ruta);
+
+        //LLama a la funcion que dibuja el grafico
         dibujaGrafo();
 
+        ruta = floyd->getRuta(nodoInicioSeleccionado,nodoDestinoSeleccionado);
+
+        //Llama a la funcion que dibuja la ruta
         controlDibujo(ruta);
-    }
+
+    }//Salida
 }
 
 void Controladora::checkSeleccion(){
-
+    //Analiza cual fue el radioButton seleccionado
     if(dijkstraRadio->isChecked()){
-
+        //Habilita el combo box del nodo de inicio
         menuInicioDijkstra->setEnabled(true);
 
     }else{
-
+        //Deshabilita los combo box
         menuInicioDijkstra->setEnabled(false);
 
         menuDestinoDijkstra->setEnabled(false);
     }
 
     if(floydRadio->isChecked()){
-
+        //Habilita el combo box del nodo de inicio
         menuInicioFloyd->setEnabled(true);
 
     }else{
-
+        //Deshabilita los combo box
         menuInicioFloyd->setEnabled(false);
 
         menuDestinoFloyd->setEnabled(false);
@@ -322,53 +366,62 @@ void Controladora::checkSeleccion(){
 
     if(primRadio->isChecked()){
 
-        nombreArchivo= primRadio->text();
+        nombreArchivo= primRadio->text();//Almacena el nombe del archivo
 
+        //Crea la instacia del algoritmo
         Prim *alPrim = new Prim(cantidadNodos,matrizAdyacencia);
 
+        //Almacena los arreglos con los nodos de cada ruta
         ArrayList<int> nodosInicio = alPrim->getRutaInicial();
 
         ArrayList<int> nodosDestino =alPrim->getRutaDestino();
 
+        //Crea el documento con la ruta
         algoritmoDocumentos(nodosInicio,nodosDestino);
 
+        //Dibuja el grafo de la matriz de adyacencia
         dibujaGrafo();
 
-        controlDibujo(nodosInicio,nodosDestino);
+        controlDibujo(nodosInicio,nodosDestino);//Dibuja el recorrido de la ruta
     }
 
     if (kruskalRadio->isChecked()){
 
-        nombreArchivo= kruskalRadio->text();
+        nombreArchivo= kruskalRadio->text();//Almacena el nombre para crear el archivo
 
-        Kruskal *kruskal = new Kruskal(matrizAdyacencia,cantidadNodos);
+        Kruskal *kruskal = new Kruskal(matrizAdyacencia,cantidadNodos);//Crea la instancia del algoritmo
 
+        //Almacena los array con los valores del recorrido
         ArrayList<int> nodosInicio = kruskal->getRutaInicial();
 
         ArrayList<int> nodosDestino =kruskal->getRutaDestino();
 
+        //Crea el documento para luego ser almacenado
         algoritmoDocumentos(nodosInicio,nodosDestino);
 
-        dibujaGrafo();
+        dibujaGrafo();//Dibuja el grafo de la matriz de adyacencia
 
-        controlDibujo(nodosInicio,nodosDestino);
+        controlDibujo(nodosInicio,nodosDestino);//Dibuja el recorrido
     }
 
     if(warshallRadio->isChecked()){
 
-        nombreArchivo= warshallRadio->text();
+        nombreArchivo= warshallRadio->text();//Almacena el nombre para crear el archivo
 
+        //Crea la instancia del algorimo
         Warshall *warshall = new Warshall(cantidadNodos,matrizAdyacencia);
 
+        //Almacena la matriz de resultado del algoritmo
         Matriz<ArrayList<int>*,int> matrizWarshall = warshall->getMatriz();
 
-        algoritmoDocumentos(matrizWarshall);
+        algoritmoDocumentos(matrizWarshall);//Agrega la matriz al documento
 
-        dibujaGrafo();
+        dibujaGrafo();//Dibuja el grafo de la matriz de adyacencia
     }
 }
 
 void Controladora::deleteEtiquetas(){
+    //Esconde y elimina los combobox despues de ser utilizados
 
     dijkstraRadio->setVisible(false);
     floydRadio->setVisible(false);
@@ -392,6 +445,10 @@ void Controladora::deleteEtiquetas(){
 }
 
 void Controladora::dibujaGrafo(){
+    //En esta funcion crea la ventana emergente con el archivo creado
+    //Inicializa el lapiz con el que se dibujaran las aritas y elimina
+    //los combo box, ademas crea los botones de crear el texto y devolverse,
+    //inicializa los arreglos para el almacenamiento de las coordenadas y pos de las mesas
     scene->clear();
 
     pen = new QPen ();
@@ -430,6 +487,8 @@ void Controladora::dibujaGrafo(){
 }
 
 void Controladora::agregaNodos(){
+    //Esta funcion agrega las mesas en pantalla y almacena las coordenas
+    // y posicion en una matriz y luego dibuja las aritas correspondientes
 
     for(int i=0;i<filasMatriz;i++){
         matrizUbicaciones->returnPos(i)->allEqual(-1);
@@ -498,6 +557,9 @@ void Controladora::agregaNodos(){
 }
 
 int Controladora::buscaNodo(int nodo,bool llave){
+    //Busca la fila y columna en la que se encuentra segun,
+    //la llave booleana ingresada en base a la matriz creada
+
     bool bandera=true;
     int i=0;
     while(i<filasMatriz && bandera){
@@ -514,6 +576,8 @@ int Controladora::buscaNodo(int nodo,bool llave){
 }
 
 void Controladora::controlDibujo(ArrayList<int> nodosInicio, ArrayList<int> nodosDestino){
+    //Controla el dibujo de las conexiones cuando se ingresan 2 arreglos
+
         srand(time(NULL));
 
         for(int i=0;i<cantidadNodos;i++){
@@ -538,6 +602,7 @@ void Controladora::controlDibujo(ArrayList<int> nodosInicio, ArrayList<int> nodo
 }
 
 void Controladora::controlDibujo(ArrayList<int> nodos){
+    //Controla el dibujo de las conexiones cuando se inserta un solo arreglo
 
     srand(time(NULL));
 
@@ -561,6 +626,8 @@ void Controladora::controlDibujo(ArrayList<int> nodos){
 }
 
 void Controladora::dibujaLinea(int nodoInicio,int nodoDestino){
+    /*Dibuja las lineas correspondientes a cada conexion en base a su pos
+     * en la matriz creada */
 
     int coorXDestino=arrayCoordenasX->returnPos(nodoInicio)+28.5;
     int coorYDestino=arrayCoordenasY->returnPos(nodoInicio)+80.5;
@@ -578,7 +645,7 @@ void Controladora::dibujaLinea(int nodoInicio,int nodoDestino){
 
     distanciaColumnas = abs(distanciaColumnas);
 
-
+    //Se valida para dar el valor de distancia entre columnas
     if(filaNodoInicio != filaNodoDestino || (nodoDestino==0 || nodoInicio == 0) ){
     distanciaColumnas=56.5;
 
@@ -593,6 +660,7 @@ void Controladora::dibujaLinea(int nodoInicio,int nodoDestino){
 
     coorXInicio=coorXDestino;
 
+    //Se valida para la creacion de 2 lineas adicionales para que no choque contra las mesas
     if(filaNodoInicio != filaNodoDestino || nodoDestino==0 || nodoInicio == 0){
 
             line = scene->addLine(coorXInicio,coorYInicio,
@@ -611,47 +679,35 @@ void Controladora::dibujaLinea(int nodoInicio,int nodoDestino){
 }
 
 void Controladora::retroceder(){
+    //Slot para poder devolverse al menu de seleccion de algoritmos
     menuSeleccionFunciones();
 }
 
 void Controladora::retrocederMenuPrincipal(){
+    //Slot para eliminar radiobuttons y combobox para
+   // devolverse a la pag de inicio
+
     deleteEtiquetas();
     agregarBotonesJugar();
 }
 
 void Controladora::startMenu(){
+    //Llama a la funcion que obtiene el path del archivo
+    // y que lo almacena
+
     getDireccionArchivo();
 }
 
 void Controladora::exit(){
+    //Cierra la aplicacion
     QCoreApplication::quit();
 }
 
 void Controladora::algoritmoDocumentos
-(Matriz<ArrayList<int> *, int> matrizFloyd, Matriz<ArrayList<int> *, int> matrizRutas, ArrayList<int> nodosRutas){
+(Floyd *floyd,Matriz<ArrayList<int> *, int> matrizRutas, ArrayList<int> nodosRutas){
 
-    archivo+="Matriz de Adyacencia \r\n";
-    for(int i = 0;i<cantidadNodos;i++){
-        if(i==nulo){
-            archivo+="       Cocina";
-        }else{
-            archivo+=" Mesa "+QString::number(i);
-        }
-    }
-    archivo+="\r\n";
 
-    for(int i=0;i<cantidadNodos;i++){
-        if(i==nulo){
-            archivo+="Cocina     ";
-        }else{
-           archivo+="Mesa "+QString::number(i)+"     ";
-        }
-        for(int j=0;j<cantidadNodos;j++){
-            archivo+=QString::number(matrizFloyd.returnPos(i)->returnPos(j))+"     ";
-        }
-        archivo+="\r\n";
-   }
-    archivo+="\r\n Matriz de Rutas \r\n";
+    archivo+="Matriz de Rutas \r\n";
 
     for(int i = 0;i<cantidadNodos;i++){
         if(i==nulo){
@@ -685,6 +741,25 @@ void Controladora::algoritmoDocumentos
         }
     }
     archivo+="\r\n";
+    archivo+="\r\n Recorrido de las rutas posibles \r\n";
+    for(int i = 0;i<cantidadNodos;i++){
+        for(int j = 0; j<cantidadNodos;j++){
+            if(j!=i){
+                ArrayList<int> rutas=floyd->getRuta(i,j);
+                for(int k =0;k<cantidadNodos-1;k++){
+                    int nodo = rutas.returnPos(k);
+                    if(nodo==nulo){
+                        archivo+=" Cocina";
+                    }else if (nodo!=-1){
+                        archivo+=" Mesa "+QString::number(nodo);
+                    }
+                }
+                archivo+="\r\n";
+            }
+      }
+
+    }
+
     return;
 }
 
@@ -828,6 +903,8 @@ void Controladora::algoritmoDocumentos(ArrayList<int> nodosInicio, ArrayList<int
 }
 
 void Controladora::creaDocumento(){
+    //Crea el documento con el string generado, primero valida
+    // que no exista para despues crearlo
     bool flag = true;
     QString doc = path+nombreArchivo+".txt";
 
@@ -849,5 +926,6 @@ void Controladora::creaDocumento(){
 }
 
 void Controladora::generadorDocumento(){
+    //Llama a la funcion que crea el documento
     creaDocumento();
 }

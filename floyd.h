@@ -3,6 +3,8 @@
 
 #include "Matriz.h"
 
+#include <QString>
+
 #include <iostream>
 #include <stdlib.h>
 
@@ -11,11 +13,12 @@ using namespace std;
 class Floyd
 {
     public:
-        Floyd(int nodos, int nodoInicio, int nodoDestino, Matriz<ArrayList<int> *, int> *matrizPesos);
+        Floyd(int nodos, Matriz<ArrayList<int> *, int> *matrizPesos, QString archivo);
         void algoritmoFloyd();
         Matriz<ArrayList<int> *, int> getMatrizRutas();
         Matriz<ArrayList<int> *, int> getMatrizPesos();
-        ArrayList<int> getRuta();
+        ArrayList<int> getRuta(int nodoInicio,int nodoDestino);
+        QString getArchivo();
         virtual ~Floyd();
 
     protected:
@@ -27,6 +30,8 @@ class Floyd
         int nodos;
         int nodoInicio;
         int nodoDestino;
+
+        QString archivo;
     private:
 };
 
