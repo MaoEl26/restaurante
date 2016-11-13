@@ -10,5 +10,6 @@
         <file>Imagenes/B_ATRAS.png</file>
         <file>Imagenes/fondo cuadros.png</file>
         <file>Imagenes/siguiente.png</file>
+        <file>Imagenes/cancelar.png</file>
     </qresource>
 </RCC>

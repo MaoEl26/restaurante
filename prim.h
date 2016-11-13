@@ -16,6 +16,7 @@ class Prim
         void busquedaNodoMenor();
         ArrayList<int> getRutaInicial();
         ArrayList<int> getRutaDestino();
+        ArrayList<int> getPesos();
 
     protected:
         int nodos;
@@ -24,6 +25,7 @@ class Prim
         ArrayList<bool> *nodosVisitados;
         ArrayList<int> *nodosInicial;
         ArrayList<int> *nodosDestinos;
+        ArrayList<int> *arrayPesos;
         int filaMenor;
         int columnaMenor;
         int pesoMayor;

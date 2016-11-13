@@ -55,6 +55,7 @@ protected:
     int algoritmoUsado;
     int posNodo=0;
     bool menuPrincipal= false;
+    bool detieneDelay = false;
 
     QTimer *timer;
 
@@ -107,6 +108,7 @@ public:
     Boton *atrasBoton;
     Boton *generaDocumento;
     Boton *siguiente;
+    Boton *sennalDelay;
 
     QRadioButton *dijkstraRadio;
     QRadioButton *floydRadio;
@@ -147,6 +149,7 @@ public slots:
 
         void generadorDocumento();
         void siguienteLinea();
+        void detenerDelay();
 
 };
 

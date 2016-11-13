@@ -123,14 +123,14 @@ void Controladora::menuSeleccionFunciones(){
 
     //Añade el boton de salir
     salirBoton = new Boton(":/Imagenes/B_SALIR.png");
-    salirBoton->setPos(1200,610);
-    salirBoton->setScale(1.3);
+    salirBoton->setPos(1200,9);
+    salirBoton->setScale(1);
     connect(salirBoton,SIGNAL(clicked()),this,SLOT(exit()));
     scene->addItem(salirBoton);
 
     atrasBoton = new Boton(":/Imagenes/B_ATRAS.png");
-    atrasBoton->setPos(0,610);
-    atrasBoton->setScale(1.3);
+    atrasBoton->setPos(0,9);
+    atrasBoton->setScale(1);
     connect(atrasBoton,SIGNAL(clicked()),this,SLOT(retrocederMenuPrincipal()));
     scene->addItem(atrasBoton);
 
@@ -278,7 +278,6 @@ void Controladora::guardaNodoDestinoDijkstra(){
                                   // desplegarlo en pantalla
 
         dibujaGrafo();//LLama a la funcion que dibuja el grafo
-
         algoritmoUsado=1;
     }
 }
@@ -446,6 +445,7 @@ void Controladora::dibujaGrafo(){
     //los combo box, ademas crea los botones de crear el texto y devolverse,
     //inicializa los arreglos para el almacenamiento de las coordenadas y pos de las mesas
     scene->clear();
+    menuPrincipal= false;
 
     pen = new QPen ();
 
@@ -462,22 +462,28 @@ void Controladora::dibujaGrafo(){
     areaTexto->show();
 
     generaDocumento = new Boton(":/Imagenes/B_GUARDAR.png");
-    generaDocumento->setPos(0,560);
-    generaDocumento->setScale(1.3);
+    generaDocumento->setPos(0,50);
+    generaDocumento->setScale(1);
     connect(generaDocumento,SIGNAL(clicked()),this,SLOT(generadorDocumento()));
     scene->addItem(generaDocumento);
 
     atrasBoton = new Boton(":/Imagenes/B_ATRAS.png");
-    atrasBoton->setPos(0,610);
-    atrasBoton->setScale(1.3);
+    atrasBoton->setPos(0,9);
+    atrasBoton->setScale(1);
     connect(atrasBoton,SIGNAL(clicked()),this,SLOT(retroceder()));
     scene->addItem(atrasBoton);
 
     siguiente = new Boton(":/Imagenes/siguiente.png");
-    siguiente->setPos(1200,10);
-    siguiente->setScale(1.5);
+    siguiente->setPos(1202,9);
+    siguiente->setScale(0.5);
     connect(siguiente,SIGNAL(clicked()),this,SLOT(siguienteLinea()));
     scene->addItem(siguiente);
+
+    sennalDelay = new Boton(":/Imagenes/cancelar.png");
+    sennalDelay->setPos(1146,9);
+    sennalDelay->setScale(0.5);
+    connect(sennalDelay,SIGNAL(clicked()),this,SLOT(detenerDelay()));
+    scene->addItem(sennalDelay);
 
     cantidadMesas = 0;
 
@@ -540,20 +546,25 @@ void Controladora::agregaNodos(){
     }
 
     for(int i=0;i<cantidadNodos;i++){
+        if(menuPrincipal== false){
         for(int j=0;j<cantidadNodos;j++){
+            if(menuPrincipal){
+                break;
+            }
             int valor = matrizAdyacencia->returnPos(i)->returnPos(j);
 
             if (valor!=-1&& valor!=0 ){
-
                 int r = rand() % 75+180;
                 int g = rand() % 115+35;
                 int b = rand() % 115+35;
-
                 QColor color(r,g,b);
                 pen->setColor(color);
                 dibujaLinea(i,j);
-                delay();
+                if(detieneDelay== false){
+                    delay();
+                }
             }
+        }
         }
     }
     pen->setWidth(4);
@@ -683,7 +694,10 @@ void Controladora::dibujaLinea(int nodoInicio,int nodoDestino){
 
 void Controladora::retroceder(){
     //Slot para poder devolverse al menu de seleccion de algoritmos
+    detieneDelay = false;
+    menuPrincipal= true;
     menuSeleccionFunciones();
+
 }
 
 void Controladora::retrocederMenuPrincipal(){
@@ -692,6 +706,8 @@ void Controladora::retrocederMenuPrincipal(){
 
     deleteEtiquetas();
     agregarBotonesJugar();
+
+
 }
 
 void Controladora::startMenu(){
@@ -708,6 +724,7 @@ void Controladora::exit(){
 
 void Controladora::algoritmoDocumentos
 (Matriz<ArrayList<int> *, int> matrizRutas, ArrayList<int> nodosRutas){
+
 
     archivo+="Matriz de Rutas \r\n";
 
@@ -727,7 +744,6 @@ void Controladora::algoritmoDocumentos
         }else{
             archivo+="Mesa "+QString::number(i)+"     ";
         }
-
 
         for(int j=0;j<cantidadNodos;j++){
             archivo+=QString::number(matrizRutas.returnPos(i)->returnPos(j))+"     ";
@@ -821,7 +837,6 @@ void Controladora::algoritmoDocumentos(Matriz<ArrayList<int> *, int> matriz){
 void Controladora::algoritmoDocumentos(ArrayList<int> nodosRutas){
 
     ArrayList<int> pesosRutaDijkstra = dijkstra->getRutaPesos();
-
     archivo+="Matriz de Adyacencia \r\n";
 
     for(int i = 0;i<cantidadNodos;i++){
@@ -844,27 +859,28 @@ void Controladora::algoritmoDocumentos(ArrayList<int> nodosRutas){
         }
         archivo+="\r\n";
    }
+
     int pesoTotal=0;
     archivo+="\r\nRecorrido de la ruta seleccionada:\r\n\r\n";
     for(int i = 0;i<cantidadNodos;i++){
-
         int nodo = nodosRutas.returnPos(i);
         if(nodo==nulo){
-            archivo+=" Cocina ";
+            archivo+="Cocina";
         }else if (nodo!=-1){
             archivo+=" Mesa "+QString::number(nodo);
         }
     }
     archivo+="\r\n";
-    for(int i = 0;i<cantidadNodos;i++){
-        int peso = pesosRutaDijkstra.returnPos(i);
-        if (peso!=-1){
-        pesoTotal+=peso;
-        archivo+="     "+QString::number(peso)+"     ";
+        for(int i = 0;i<cantidadNodos;i++){
+            int peso = pesosRutaDijkstra.returnPos(i);
+            if (peso!=-1){
+            pesoTotal+=peso;
+            archivo+="     "+QString::number(peso)+"     ";
+            }
         }
-    }
-    archivo+="\r\n\r\n";
-    archivo+="Peso total del recorrido: "+QString::number(pesoTotal)+"\r\n";
+        archivo+="\r\n\r\n";
+        archivo+="Peso total del recorrido: "+QString::number(pesoTotal)+"\r\n";
+
     return;
 }
 
@@ -952,13 +968,14 @@ void Controladora::siguienteLinea()
 {
     int color = rand() % 8+1;
 
-        if(color== 1){pen->setColor(Qt::blue);}
-        else if(color==2){pen->setColor(Qt::white);}
-        else if(color== 3){pen->setColor(Qt::darkMagenta);}
-        else if(color== 4){pen->setColor(Qt::black);}
-        else if(color== 5){pen->setColor(Qt::yellow);}
-        else if(color== 6){pen->setColor(Qt::green);}
-        else if(color== 7){pen->setColor(Qt::darkCyan);}
+    if(color== 1){pen->setColor(Qt::blue);}
+    else if(color==2){pen->setColor(Qt::white);}
+    else if(color== 3){pen->setColor(Qt::darkMagenta);}
+    else if(color== 4){pen->setColor(Qt::black);}
+    else if(color== 5){pen->setColor(Qt::yellow);}
+    else if(color== 6){pen->setColor(Qt::green);}
+    else if(color== 7){pen->setColor(Qt::darkCyan);}
+
 
     if(algoritmoUsado == 1){
         int nodoInicio = dijkstra->getRutaNodo().returnPos(posNodo);
@@ -1010,6 +1027,11 @@ void Controladora::siguienteLinea()
             algoritmoUsado=-1;
         }
     }
+}
+
+void Controladora::detenerDelay()
+{
+    detieneDelay=true;
 }
 
 

@@ -19,6 +19,7 @@ Prim::Prim(int nodos, Matriz<ArrayList<int> *, int> *matriz)
     nodosVisitados = new ArrayList<bool>(nodos); //Indicara cuales nodos ya fueron visitados
     nodosInicial = new ArrayList<int>(nodos);
     nodosDestinos = new ArrayList<int>(nodos);
+    arrayPesos= new ArrayList<int>(nodos);
     cantidadNodosVisitados=1; //ira aumentando de acuerdo a los nodos q ya se visitaron
     cantidadNodos();
 }
@@ -34,6 +35,7 @@ void Prim::cantidadNodos(){
     nodosVisitados->setValue(0,true);
     nodosInicial->allEqual(infinito);
     nodosDestinos->allEqual(infinito);
+    arrayPesos->allEqual(infinito);
 
     for(int i=0; i<nodos; i++){
         //Pone en true la diagonal
@@ -59,6 +61,7 @@ void Prim::algoritmo(){
         nodosVisitados->setValue(columnaMenor,true);
         nodosInicial->setValue(contador,filaMenor);
         nodosDestinos->setValue(contador,columnaMenor);
+        arrayPesos->setValue(contador,matrizPesos->returnPos(filaMenor)->returnPos(columnaMenor));
         contador++;
     }
 }
@@ -90,6 +93,10 @@ ArrayList<int> Prim::getRutaInicial(){
 
 ArrayList<int> Prim::getRutaDestino(){
     return *nodosDestinos;
+}
+
+ArrayList<int> Prim::getPesos(){
+    return *arrayPesos;
 }
 
 Prim::~Prim()
