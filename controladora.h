@@ -88,7 +88,7 @@ public:
     int buscaNodo(int nodo,bool llave);
 
     //Creacion de Documento de los algoritmos
-    void algoritmoDocumentos(Floyd *floyd, Matriz<ArrayList<int> *, int> matrizRutas, ArrayList<int> nodosRutas);
+    void algoritmoDocumentos(Matriz<ArrayList<int> *, int> matrizRutas, ArrayList<int> nodosRutas);
     void algoritmoDocumentos(ArrayList<int> nodosRutas);
     void algoritmoDocumentos(ArrayList<int> nodosInicio,ArrayList<int> nodosDestino);
     void algoritmoDocumentos(Matriz<ArrayList<int> *, int> matriz);

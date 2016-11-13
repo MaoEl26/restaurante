@@ -17,7 +17,6 @@ Floyd::Floyd(int nodos, Matriz<ArrayList<int> *, int> *matrizPesos,QString archi
 
     matrizRutas = new Matriz<ArrayList<int>*,int>(nodos);
     ruta= new ArrayList<int>(nodos);
-    //ruta->allEqual(infinito);
 
     for(int i=0;i<nodos;i++){
         matrizRutas->returnPos(i)->allEqual(0);
@@ -113,18 +112,30 @@ Matriz<ArrayList<int> *, int> Floyd::getMatrizRutas(){
 }
 
 ArrayList<int> Floyd::getRuta(int nodoInicio, int nodoDestino){
+
     ruta->clear();
+    pesoRuta = 0;
+
     ruta->allEqual(-1);
+
     ruta->goToPos(0);
     ruta->insert(nodoInicio);
+
     ruta->goToPos(1);
     ruta->insert(nodoDestino);
+
     bool bandera=false;
     int pos=1;
+
     while(!bandera){
         int valor=matrizRutas->returnPos(nodoInicio)->returnPos(nodoDestino);
+
+        int peso=matrizDn->returnPos(nodoInicio)->returnPos(nodoDestino);
+        pesoRuta+=peso;
+
         if (valor==0){
             bandera=true;
+
         }else{
             nodoInicio=valor-1;
             ruta->goToPos(pos);
@@ -138,6 +149,10 @@ ArrayList<int> Floyd::getRuta(int nodoInicio, int nodoDestino){
 
 QString Floyd::getArchivo(){
     return archivo;
+}
+
+int Floyd::getPesoRuta(){
+    return pesoRuta;
 }
 
 Floyd::~Floyd()

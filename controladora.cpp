@@ -278,6 +278,7 @@ void Controladora::guardaNodoDestinoDijkstra(){
                                   // desplegarlo en pantalla
 
         dibujaGrafo();//LLama a la funcion que dibuja el grafo
+
         algoritmoUsado=1;
     }
 }
@@ -326,7 +327,7 @@ void Controladora::guardaNodoDestinoFloyd(){
         archivo=floyd->getArchivo();
 
         //Crea el documento y lo muestra en pantalla
-        algoritmoDocumentos(floyd,matrizRutas,ruta);
+        algoritmoDocumentos(matrizRutas,ruta);
 
         //LLama a la funcion que dibuja el grafico
         dibujaGrafo();
@@ -544,9 +545,10 @@ void Controladora::agregaNodos(){
 
             if (valor!=-1&& valor!=0 ){
 
-                int r = (rand() % 178)+20;
-                int g = (rand() % 178)+22;
-                int b = (rand() % 178)+21;
+                int r = rand() % 75+180;
+                int g = rand() % 115+35;
+                int b = rand() % 115+35;
+
                 QColor color(r,g,b);
                 pen->setColor(color);
                 dibujaLinea(i,j);
@@ -705,8 +707,7 @@ void Controladora::exit(){
 }
 
 void Controladora::algoritmoDocumentos
-(Floyd *floyd,Matriz<ArrayList<int> *, int> matrizRutas, ArrayList<int> nodosRutas){
-
+(Matriz<ArrayList<int> *, int> matrizRutas, ArrayList<int> nodosRutas){
 
     archivo+="Matriz de Rutas \r\n";
 
@@ -727,11 +728,13 @@ void Controladora::algoritmoDocumentos
             archivo+="Mesa "+QString::number(i)+"     ";
         }
 
+
         for(int j=0;j<cantidadNodos;j++){
             archivo+=QString::number(matrizRutas.returnPos(i)->returnPos(j))+"     ";
         }
         archivo+="\r\n";
    }
+    int pesoRuta= floyd->getPesoRuta();
     archivo+="\r\n Recorrido de la ruta seleccionada \r\n";
     for(int i = 0;i<cantidadNodos;i++){
         int nodo = nodosRutas.returnPos(i);
@@ -741,12 +744,14 @@ void Controladora::algoritmoDocumentos
             archivo+=" Mesa "+QString::number(nodo);
         }
     }
+    archivo+="\r\nPeso del Recorrido: "+QString::number(pesoRuta);
     archivo+="\r\n";
     archivo+="\r\n Recorrido de las rutas posibles \r\n";
     for(int i = 0;i<cantidadNodos;i++){
         for(int j = 0; j<cantidadNodos;j++){
             if(j!=i){
                 ArrayList<int> rutas=floyd->getRuta(i,j);
+                int pesoRuta= floyd->getPesoRuta();
                 for(int k =0;k<cantidadNodos-1;k++){
                     int nodo = rutas.returnPos(k);
                     if(nodo==nulo){
@@ -755,7 +760,8 @@ void Controladora::algoritmoDocumentos
                         archivo+=" Mesa "+QString::number(nodo);
                     }
                 }
-                archivo+="\r\n";
+                archivo+="\r\nPeso del Recorrido: "+QString::number(pesoRuta);
+                archivo+="\r\n\r\n";
             }
       }
 
@@ -814,6 +820,8 @@ void Controladora::algoritmoDocumentos(Matriz<ArrayList<int> *, int> matriz){
 
 void Controladora::algoritmoDocumentos(ArrayList<int> nodosRutas){
 
+    ArrayList<int> pesosRutaDijkstra = dijkstra->getRutaPesos();
+
     archivo+="Matriz de Adyacencia \r\n";
 
     for(int i = 0;i<cantidadNodos;i++){
@@ -836,18 +844,27 @@ void Controladora::algoritmoDocumentos(ArrayList<int> nodosRutas){
         }
         archivo+="\r\n";
    }
-
-    archivo+="\r\n Recorrido de la ruta seleccionada \r\n";
+    int pesoTotal=0;
+    archivo+="\r\nRecorrido de la ruta seleccionada:\r\n\r\n";
     for(int i = 0;i<cantidadNodos;i++){
+
         int nodo = nodosRutas.returnPos(i);
         if(nodo==nulo){
-            archivo+="Cocina";
+            archivo+=" Cocina ";
         }else if (nodo!=-1){
             archivo+=" Mesa "+QString::number(nodo);
         }
     }
     archivo+="\r\n";
-
+    for(int i = 0;i<cantidadNodos;i++){
+        int peso = pesosRutaDijkstra.returnPos(i);
+        if (peso!=-1){
+        pesoTotal+=peso;
+        archivo+="     "+QString::number(peso)+"     ";
+        }
+    }
+    archivo+="\r\n\r\n";
+    archivo+="Peso total del recorrido: "+QString::number(pesoTotal)+"\r\n";
     return;
 }
 
@@ -933,12 +950,15 @@ void Controladora::generadorDocumento(){
 
 void Controladora::siguienteLinea()
 {
-   // int r = rand() % 255 + 96;
-    //int g = rand() % 255 + 117;
-    //int b = rand() % 255 + 113;
+    int color = rand() % 8+1;
 
-    //QColor color(r,g,b);
-   // pen->setColor(color);
+        if(color== 1){pen->setColor(Qt::blue);}
+        else if(color==2){pen->setColor(Qt::white);}
+        else if(color== 3){pen->setColor(Qt::darkMagenta);}
+        else if(color== 4){pen->setColor(Qt::black);}
+        else if(color== 5){pen->setColor(Qt::yellow);}
+        else if(color== 6){pen->setColor(Qt::green);}
+        else if(color== 7){pen->setColor(Qt::darkCyan);}
 
     if(algoritmoUsado == 1){
         int nodoInicio = dijkstra->getRutaNodo().returnPos(posNodo);
