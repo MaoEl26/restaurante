@@ -269,7 +269,7 @@ void Controladora::guardaNodoDestinoDijkstra(){
                                   // de la matriz de adyacencia
 
         //Inicializa el algoritmo
-        Dijkstra *dijkstra = new Dijkstra
+        dijkstra = new Dijkstra
                 (cantidadNodos,nodoInicioSeleccionado,nodoDestinoSeleccionado,matrizAdyacencia);
 
         ArrayList<int> ruta = dijkstra->getRutaNodo();//Almacena el arreglo de las rutas
@@ -278,8 +278,7 @@ void Controladora::guardaNodoDestinoDijkstra(){
                                   // desplegarlo en pantalla
 
         dibujaGrafo();//LLama a la funcion que dibuja el grafo
-
-        controlDibujo(ruta);//Realiza el dibujo del recorrido que creo el algoritmo
+        algoritmoUsado=1;
     }
 }
 
@@ -316,7 +315,7 @@ void Controladora::guardaNodoDestinoFloyd(){
                                    // con la matriz de adyacencia
 
         //Crea la instancia del algoritmo de Floyd
-        Floyd *floyd = new Floyd(cantidadNodos,matrizAdyacencia,archivo);
+        floyd = new Floyd(cantidadNodos,matrizAdyacencia,archivo);
 
         //Almacena la matriz de rutas para la creacion del documento
         Matriz<ArrayList<int>*,int> matrizRutas = floyd->getMatrizRutas();
@@ -335,7 +334,7 @@ void Controladora::guardaNodoDestinoFloyd(){
         ruta = floyd->getRuta(nodoInicioSeleccionado,nodoDestinoSeleccionado);
 
         //Llama a la funcion que dibuja la ruta
-        controlDibujo(ruta);
+        algoritmoUsado=2;
 
     }//Salida
 }
@@ -365,11 +364,11 @@ void Controladora::checkSeleccion(){
     }
 
     if(primRadio->isChecked()){
-
+        algoritmoUsado=3;
         nombreArchivo= primRadio->text();//Almacena el nombe del archivo
 
         //Crea la instacia del algoritmo
-        Prim *alPrim = new Prim(cantidadNodos,matrizAdyacencia);
+        alPrim = new Prim(cantidadNodos,matrizAdyacencia);
 
         //Almacena los arreglos con los nodos de cada ruta
         ArrayList<int> nodosInicio = alPrim->getRutaInicial();
@@ -381,15 +380,13 @@ void Controladora::checkSeleccion(){
 
         //Dibuja el grafo de la matriz de adyacencia
         dibujaGrafo();
-
-        controlDibujo(nodosInicio,nodosDestino);//Dibuja el recorrido de la ruta
     }
 
     if (kruskalRadio->isChecked()){
-
+        algoritmoUsado=4;
         nombreArchivo= kruskalRadio->text();//Almacena el nombre para crear el archivo
 
-        Kruskal *kruskal = new Kruskal(matrizAdyacencia,cantidadNodos);//Crea la instancia del algoritmo
+        kruskal = new Kruskal(matrizAdyacencia,cantidadNodos);//Crea la instancia del algoritmo
 
         //Almacena los array con los valores del recorrido
         ArrayList<int> nodosInicio = kruskal->getRutaInicial();
@@ -401,15 +398,13 @@ void Controladora::checkSeleccion(){
 
         dibujaGrafo();//Dibuja el grafo de la matriz de adyacencia
 
-        controlDibujo(nodosInicio,nodosDestino);//Dibuja el recorrido
     }
 
     if(warshallRadio->isChecked()){
-
         nombreArchivo= warshallRadio->text();//Almacena el nombre para crear el archivo
 
         //Crea la instancia del algorimo
-        Warshall *warshall = new Warshall(cantidadNodos,matrizAdyacencia);
+        warshall = new Warshall(cantidadNodos,matrizAdyacencia);
 
         //Almacena la matriz de resultado del algoritmo
         Matriz<ArrayList<int>*,int> matrizWarshall = warshall->getMatriz();
@@ -476,6 +471,12 @@ void Controladora::dibujaGrafo(){
     atrasBoton->setScale(1.3);
     connect(atrasBoton,SIGNAL(clicked()),this,SLOT(retroceder()));
     scene->addItem(atrasBoton);
+
+    siguiente = new Boton(":/Imagenes/siguiente.png");
+    siguiente->setPos(1200,10);
+    siguiente->setScale(1.5);
+    connect(siguiente,SIGNAL(clicked()),this,SLOT(siguienteLinea()));
+    scene->addItem(siguiente);
 
     cantidadMesas = 0;
 
@@ -578,6 +579,7 @@ int Controladora::buscaNodo(int nodo,bool llave){
 void Controladora::controlDibujo(ArrayList<int> nodosInicio, ArrayList<int> nodosDestino){
     //Controla el dibujo de las conexiones cuando se ingresan 2 arreglos
 
+
         srand(time(NULL));
 
         for(int i=0;i<cantidadNodos;i++){
@@ -587,17 +589,15 @@ void Controladora::controlDibujo(ArrayList<int> nodosInicio, ArrayList<int> nodo
                 break;
             }
 
-            int r = rand() % (255);
-            int g = rand() % (255);
-            int b = rand() % (255);
+           // int r = rand() % (255);
+            //int g = rand() % (255);
+            //int b = rand() % (255);
 
-            QColor color(r,g,b);
-            pen->setColor(color);
+           // QColor color(r,g,b);
+           // pen->setColor(Qt::blue);
 
             dibujaLinea(nodoInicio,nodoDestino);
-
             delay();
-
         }
 }
 
@@ -611,12 +611,13 @@ void Controladora::controlDibujo(ArrayList<int> nodos){
         int nodoDestino = nodos.returnPos(i+1);
 
         if(nodoDestino != -1 && nodoInicio != -1 ){
-            int r = rand() % 255 + 96;
-            int g = rand() % 255 + 117;
-            int b = rand() % 255 + 113;
 
-            QColor color(r,g,b);
-            pen->setColor(color);
+         //   int r = rand() % 255 + 96;
+           // int g = rand() % 255 + 117;
+            //int b = rand() % 255 + 113;
+
+           // QColor color(r,g,b);
+            //pen->setColor(Qt::blue);
 
             dibujaLinea(nodoInicio,nodoDestino);
 
@@ -925,7 +926,70 @@ void Controladora::creaDocumento(){
     }
 }
 
-void Controladora::generadorDocumento(){
+void Controladora::generadorDocumento(){  
     //Llama a la funcion que crea el documento
     creaDocumento();
 }
+
+void Controladora::siguienteLinea()
+{
+   // int r = rand() % 255 + 96;
+    //int g = rand() % 255 + 117;
+    //int b = rand() % 255 + 113;
+
+    //QColor color(r,g,b);
+   // pen->setColor(color);
+
+    if(algoritmoUsado == 1){
+        int nodoInicio = dijkstra->getRutaNodo().returnPos(posNodo);
+        int nodoDestino = dijkstra->getRutaNodo().returnPos(posNodo+1);
+        if(nodoDestino != -1 && nodoInicio != -1 ){
+            dibujaLinea(nodoInicio,nodoDestino);
+            posNodo++;
+        }
+        else{
+            posNodo=0;
+            algoritmoUsado=-1;
+        }
+
+    }
+    else if(algoritmoUsado ==2){
+         ArrayList<int> ruta = floyd->getRuta(nodoInicioSeleccionado,nodoDestinoSeleccionado);
+         int nodoInicio = ruta.returnPos(posNodo);
+         int nodoDestino = ruta.returnPos(posNodo+1);
+         if(nodoDestino != -1 && nodoInicio != -1 ){
+             dibujaLinea(nodoInicio,nodoDestino);
+             posNodo++;
+         }
+         else{
+             posNodo=0;
+             algoritmoUsado=-1;
+         }
+    }
+    else if(algoritmoUsado ==3){
+        int nodoInicio = alPrim->getRutaInicial().returnPos(posNodo);
+        int nodoDestino = alPrim->getRutaDestino().returnPos(posNodo);
+        if(nodoDestino != -1 || nodoInicio != -1){
+            dibujaLinea(nodoInicio,nodoDestino);
+            posNodo++;
+        }
+        else{
+            posNodo=0;
+            algoritmoUsado=-1;
+        }
+    }
+    else if (algoritmoUsado ==4){
+        int nodoInicio = kruskal->getRutaInicial().returnPos(posNodo);
+        int nodoDestino = kruskal->getRutaDestino().returnPos(posNodo);
+        if(nodoDestino != -1 || nodoInicio != -1){
+            dibujaLinea(nodoInicio,nodoDestino);
+            posNodo++;
+        }
+        else{
+            posNodo=0;
+            algoritmoUsado=-1;
+        }
+    }
+}
+
+

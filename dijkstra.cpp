@@ -21,6 +21,7 @@ Dijkstra::Dijkstra(int nodos, int nodoBusqueda,int nodoDestino, Matriz<ArrayList
     posicionMenores= new ArrayList<int>(nodos);//Guardara los nodos menores q se representan con un cuadro en la matriz
     nodosVisitados = new ArrayList<bool>(nodos);  //Identificara si la columna ya tiene su nodo menor
     rutaNodo = new ArrayList<int>(nodos);
+    rutaPeso = new ArrayList<int>(nodos);
     cantidadNodos();
 }
 
@@ -191,11 +192,13 @@ void Dijkstra::ruta(){
     int peso;
     int columna= 0;
     rutaNodo->insert(nodoDestino);
+    rutaPeso->insert(pesosMenores->returnPos(nodoDestino));
     while(encontrado!=true){
         peso=pesosMenores->returnPos(nodoPosicion);
         pesoTotal+= peso;
         nodoPosicion= posicionMenores->returnPos(nodoPosicion);
         rutaNodo->insert(nodoPosicion);
+        rutaPeso->insert(pesosMenores->returnPos(nodoPosicion));
 
         columna++;
         if(pesosMenores->returnPos(nodoPosicion)== 0){
@@ -206,12 +209,17 @@ void Dijkstra::ruta(){
     for(int i =0; i<nodos; i++){
         if(i>=columna){
             rutaNodo->append(infinito);
+            rutaPeso->append(infinito);
         }
     }
 }
 
 ArrayList<int> Dijkstra::getRutaNodo(){
     return *rutaNodo;
+}
+
+ArrayList<int> Dijkstra::getRutaPesos(){
+    return *rutaPeso;
 }
 
 Dijkstra::~Dijkstra()

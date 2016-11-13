@@ -52,6 +52,9 @@ protected:
 
     int cantidadNodos;
     int cantidadMesas;
+    int algoritmoUsado;
+    int posNodo=0;
+    bool menuPrincipal= false;
 
     QTimer *timer;
 
@@ -103,6 +106,7 @@ public:
     Boton *salirBoton;
     Boton *atrasBoton;
     Boton *generaDocumento;
+    Boton *siguiente;
 
     QRadioButton *dijkstraRadio;
     QRadioButton *floydRadio;
@@ -120,6 +124,12 @@ public:
 
     QTextEdit *areaTexto;
 
+    Dijkstra *dijkstra;
+    Floyd *floyd;
+    Prim *alPrim;
+    Kruskal *kruskal;
+    Warshall *warshall;
+
 public slots:
         /// aqui va la respuesta de los boton
         void startMenu();
@@ -136,6 +146,7 @@ public slots:
         void retrocederMenuPrincipal();
 
         void generadorDocumento();
+        void siguienteLinea();
 
 };
 

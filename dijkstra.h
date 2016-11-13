@@ -24,6 +24,7 @@ class Dijkstra
         ArrayList<int>* pesosMenores;
         ArrayList<int>* posicionMenores;
         ArrayList<int>* rutaNodo;
+        ArrayList<int>* rutaPeso;
         int nodos;
         int ultimaFilaCompletada;
         int busquedaNodoMenor(int fila);
