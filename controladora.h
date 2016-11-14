@@ -22,6 +22,7 @@
 #include <QRadioButton>
 #include <QTextBrowser>
 #include <QTextEdit>
+#include <QLabel>
 
 
 #include <time.h>
@@ -54,6 +55,7 @@ protected:
     int cantidadMesas;
     int algoritmoUsado;
     int posNodo=0;
+
     bool menuPrincipal= false;
     bool detieneDelay = false;
 
@@ -91,7 +93,8 @@ public:
     //Creacion de Documento de los algoritmos
     void algoritmoDocumentos(Matriz<ArrayList<int> *, int> matrizRutas, ArrayList<int> nodosRutas);
     void algoritmoDocumentos(ArrayList<int> nodosRutas);
-    void algoritmoDocumentos(ArrayList<int> nodosInicio,ArrayList<int> nodosDestino);
+    void algoritmoDocumentos(ArrayList<int> nodosInicio,ArrayList<int> nodosDestino,
+                             ArrayList<int> pesoRuta);
     void algoritmoDocumentos(Matriz<ArrayList<int> *, int> matriz);
 
     QGraphicsScene *scene;

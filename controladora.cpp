@@ -267,18 +267,19 @@ void Controladora::guardaNodoDestinoDijkstra(){
 
         nodoDestinoSeleccionado--;//Disminuye en uno el valor para coincidir con los valores
                                   // de la matriz de adyacencia
+         if (nodoDestinoSeleccionado!=nodoInicioSeleccionado){
+            //Inicializa el algoritmo
+            dijkstra = new Dijkstra
+                    (cantidadNodos,nodoInicioSeleccionado,nodoDestinoSeleccionado,matrizAdyacencia);
 
-        //Inicializa el algoritmo
-        dijkstra = new Dijkstra
-                (cantidadNodos,nodoInicioSeleccionado,nodoDestinoSeleccionado,matrizAdyacencia);
+            ArrayList<int> ruta = dijkstra->getRutaNodo();//Almacena el arreglo de las rutas
 
-        ArrayList<int> ruta = dijkstra->getRutaNodo();//Almacena el arreglo de las rutas
+            algoritmoDocumentos(ruta);//Crea el documento con el arreglo de las rutas para luego
+                                      // desplegarlo en pantalla
 
-        algoritmoDocumentos(ruta);//Crea el documento con el arreglo de las rutas para luego
-                                  // desplegarlo en pantalla
-
-        dibujaGrafo();//LLama a la funcion que dibuja el grafo
-        algoritmoUsado=1;
+            dibujaGrafo();//LLama a la funcion que dibuja el grafo
+            algoritmoUsado=1;
+        }
     }
 }
 
@@ -313,29 +314,31 @@ void Controladora::guardaNodoDestinoFloyd(){
 
         nodoDestinoSeleccionado--; //Disminuye en uno el nodo para coincidir
                                    // con la matriz de adyacencia
+        if (nodoDestinoSeleccionado!=nodoInicioSeleccionado){
 
-        //Crea la instancia del algoritmo de Floyd
-        floyd = new Floyd(cantidadNodos,matrizAdyacencia,archivo);
 
-        //Almacena la matriz de rutas para la creacion del documento
-        Matriz<ArrayList<int>*,int> matrizRutas = floyd->getMatrizRutas();
+            //Crea la instancia del algoritmo de Floyd
+            floyd = new Floyd(cantidadNodos,matrizAdyacencia,archivo);
 
-        //Almacena el array de la ruta en un variable para la graficación
-        ArrayList<int> ruta = floyd->getRuta(nodoInicioSeleccionado,nodoDestinoSeleccionado);
+            //Almacena la matriz de rutas para la creacion del documento
+            Matriz<ArrayList<int>*,int> matrizRutas = floyd->getMatrizRutas();
 
-        archivo=floyd->getArchivo();
+            //Almacena el array de la ruta en un variable para la graficación
+            ArrayList<int> ruta = floyd->getRuta(nodoInicioSeleccionado,nodoDestinoSeleccionado);
 
-        //Crea el documento y lo muestra en pantalla
-        algoritmoDocumentos(matrizRutas,ruta);
+            archivo=floyd->getArchivo();
 
-        //LLama a la funcion que dibuja el grafico
-        dibujaGrafo();
+            //Crea el documento y lo muestra en pantalla
+            algoritmoDocumentos(matrizRutas,ruta);
 
-        ruta = floyd->getRuta(nodoInicioSeleccionado,nodoDestinoSeleccionado);
+            //LLama a la funcion que dibuja el grafico
+            dibujaGrafo();
 
-        //Llama a la funcion que dibuja la ruta
-        algoritmoUsado=2;
+            ruta = floyd->getRuta(nodoInicioSeleccionado,nodoDestinoSeleccionado);
 
+            //Llama a la funcion que dibuja la ruta
+            algoritmoUsado=2;
+        }
     }//Salida
 }
 
@@ -375,8 +378,10 @@ void Controladora::checkSeleccion(){
 
         ArrayList<int> nodosDestino =alPrim->getRutaDestino();
 
+        ArrayList<int> pesoRuta = alPrim->getPesos();
+
         //Crea el documento con la ruta
-        algoritmoDocumentos(nodosInicio,nodosDestino);
+        algoritmoDocumentos(nodosInicio,nodosDestino,pesoRuta);
 
         //Dibuja el grafo de la matriz de adyacencia
         dibujaGrafo();
@@ -393,8 +398,10 @@ void Controladora::checkSeleccion(){
 
         ArrayList<int> nodosDestino =kruskal->getRutaDestino();
 
+        ArrayList<int> pesoRuta =kruskal->getPesoRuta();
+
         //Crea el documento para luego ser almacenado
-        algoritmoDocumentos(nodosInicio,nodosDestino);
+        algoritmoDocumentos(nodosInicio,nodosDestino,pesoRuta);
 
         dibujaGrafo();//Dibuja el grafo de la matriz de adyacencia
 
@@ -533,6 +540,8 @@ void Controladora::agregaNodos(){
                 QGraphicsPixmapItem *itemMesa= new QGraphicsPixmapItem( QPixmap::fromImage(mesa));
                 itemMesa->setPos(coorX,coorY);
                 itemMesa->setScale(0.7);
+                QGraphicsTextItem *text = new QGraphicsTextItem(QString::number(cantidadMesas),itemMesa);
+                text->setScale(1.5);
                 scene->addItem(itemMesa);
                 coorY+=113;
             }
@@ -592,7 +601,6 @@ int Controladora::buscaNodo(int nodo,bool llave){
 void Controladora::controlDibujo(ArrayList<int> nodosInicio, ArrayList<int> nodosDestino){
     //Controla el dibujo de las conexiones cuando se ingresan 2 arreglos
 
-
         srand(time(NULL));
 
         for(int i=0;i<cantidadNodos;i++){
@@ -641,7 +649,7 @@ void Controladora::controlDibujo(ArrayList<int> nodos){
 
 void Controladora::dibujaLinea(int nodoInicio,int nodoDestino){
     /*Dibuja las lineas correspondientes a cada conexion en base a su pos
-     * en la matriz creada */
+      en la matriz creada */
 
     int coorXDestino=arrayCoordenasX->returnPos(nodoInicio)+28.5;
     int coorYDestino=arrayCoordenasY->returnPos(nodoInicio)+80.5;
@@ -662,10 +670,6 @@ void Controladora::dibujaLinea(int nodoInicio,int nodoDestino){
     //Se valida para dar el valor de distancia entre columnas
     if(filaNodoInicio != filaNodoDestino || (nodoDestino==0 || nodoInicio == 0) ){
     distanciaColumnas=56.5;
-
-    }else  distanciaColumnas=56.5*(distanciaColumnas+1);
-
-
     coorXDestino=coorXInicio;
     coorYDestino=coorYInicio;
 
@@ -677,21 +681,52 @@ void Controladora::dibujaLinea(int nodoInicio,int nodoDestino){
     //Se valida para la creacion de 2 lineas adicionales para que no choque contra las mesas
     if(filaNodoInicio != filaNodoDestino || nodoDestino==0 || nodoInicio == 0){
 
-            line = scene->addLine(coorXInicio,coorYInicio,
+       line = scene->addLine(coorXInicio,coorYInicio,
                                   coorXDestino,
                                   coorYDestino=arrayCoordenasY->returnPos(nodoDestino)+80.5,*pen);
-            coorYInicio=coorYDestino;
+        coorYInicio=coorYDestino;
         coorXInicio=coorXDestino;
         coorXDestino=arrayCoordenasX->returnPos(nodoDestino);
 
         line = scene->addLine(coorXInicio,coorYInicio,
                               coorXDestino=coorXDestino+28.5,coorYDestino,*pen);
         coorXInicio=coorXDestino;
-}
+    }
         line = scene->addLine(coorXInicio,coorYInicio,
                               coorXDestino ,arrayCoordenasY->returnPos(nodoDestino)+60.5,*pen);
-}
 
+    }else  {
+
+        int columnaInicio= buscaNodo(nodoInicio,true);
+        int columnaDestino = buscaNodo(nodoDestino,true);
+        if(columnaDestino != 0 || columnaInicio!=0){
+        if((columnaInicio-columnaDestino)< 0){
+            int distancia= abs(columnaInicio-columnaDestino);
+
+            distanciaColumnas=113*(distancia);
+
+            line = scene->addLine(coorXInicio,coorYInicio,
+                                  coorXInicio+distanciaColumnas,coorYInicio,*pen);
+            coorXInicio=coorXInicio+distanciaColumnas;
+        }
+
+        else if((columnaInicio-columnaDestino)!= 0){
+
+                int distancia= (columnaInicio-columnaDestino);
+
+                distanciaColumnas=113*(distancia);
+                line = scene->addLine(coorXInicio,coorYInicio,
+                                      coorXInicio-distanciaColumnas,coorYInicio,*pen);
+                coorXInicio=coorXInicio-distanciaColumnas;
+
+            }
+        line = scene->addLine(coorXInicio,coorYInicio,
+                              coorXInicio,coorYInicio-20,*pen);
+        }
+
+    }
+
+}
 void Controladora::retroceder(){
     //Slot para poder devolverse al menu de seleccion de algoritmos
     detieneDelay = false;
@@ -768,6 +803,7 @@ void Controladora::algoritmoDocumentos
             if(j!=i){
                 ArrayList<int> rutas=floyd->getRuta(i,j);
                 int pesoRuta= floyd->getPesoRuta();
+
                 for(int k =0;k<cantidadNodos-1;k++){
                     int nodo = rutas.returnPos(k);
                     if(nodo==nulo){
@@ -875,7 +911,7 @@ void Controladora::algoritmoDocumentos(ArrayList<int> nodosRutas){
             int peso = pesosRutaDijkstra.returnPos(i);
             if (peso!=-1){
             pesoTotal+=peso;
-            archivo+="     "+QString::number(peso)+"     ";
+            archivo+="    "+QString::number(peso)+"     ";
             }
         }
         archivo+="\r\n\r\n";
@@ -884,7 +920,8 @@ void Controladora::algoritmoDocumentos(ArrayList<int> nodosRutas){
     return;
 }
 
-void Controladora::algoritmoDocumentos(ArrayList<int> nodosInicio, ArrayList<int> nodosDestino){
+void Controladora::algoritmoDocumentos(ArrayList<int> nodosInicio, ArrayList<int> nodosDestino,
+                                       ArrayList<int> pesoRuta){
     archivo+="Matriz de Adyacencia \r\n";
 
     for(int i = 0;i<cantidadNodos;i++){
@@ -910,9 +947,12 @@ void Controladora::algoritmoDocumentos(ArrayList<int> nodosInicio, ArrayList<int
 
     archivo+="\r\n Recorrido de las rutas \r\n";
 
+    int pesoTotal=0;
+
     for(int i = 0;i<cantidadNodos;i++){
         int nodoInicio = nodosInicio.returnPos(i);
         int nodoDestino = nodosDestino.returnPos(i);
+        int peso = pesoRuta.returnPos(i);
 
         if(nodoInicio==nulo){
             archivo+=" Cocina ";
@@ -929,9 +969,13 @@ void Controladora::algoritmoDocumentos(ArrayList<int> nodosInicio, ArrayList<int
 
             archivo+=" Mesa "+QString::number(nodoDestino);
         }
+        if(nodoDestino!=-1&&nodoInicio!=-1){
+            archivo+=" peso: "+QString::number(peso);
+            pesoTotal+=peso;
+        }
         archivo+="\r\n";
     }
-    archivo+="\r\n";
+    archivo+="Peso total del recorrido: "+QString::number(pesoTotal);
 
     return;
 }
